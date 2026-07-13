@@ -225,3 +225,193 @@ ipInput.addEventListener("keydown", (event) => {
 window.addEventListener("DOMContentLoaded", () => {
   updateStatus("Enter an IP address to look it up, or use your device location.");
 });
+
+/* ---------- radar scanner panel ---------- */
+const radarCanvas = document.getElementById('radar');
+const radarCtx = radarCanvas.getContext('2d');
+const pixelGrid = document.getElementById('pixelGrid');
+const eqLeft = document.getElementById('eqLeft');
+const eqRight = document.getElementById('eqRight');
+const spectrum = document.getElementById('spectrum');
+let radarTargets = [];
+
+function resizeRadar() {
+  const rect = radarCanvas.parentElement.getBoundingClientRect();
+  const size = Math.floor(Math.min(rect.width, rect.height));
+  radarCanvas.width = size;
+  radarCanvas.height = size;
+}
+window.addEventListener('resize', resizeRadar);
+resizeRadar();
+
+function initRadarTargets() {
+  radarTargets = [];
+  for (let i = 0; i < 10; i++) {
+    radarTargets.push({
+      angle: Math.random() * 360,
+      radius: 0.22 + Math.random() * 0.7,
+      speed: (Math.random() * 0.12 - 0.02),
+      heading: Math.random() * 360,
+      intensity: 0.35 + Math.random() * 0.1,
+    });
+  }
+}
+initRadarTargets();
+
+let sweepAngle = 0;
+const SWEEP_SPEED = 0.7;
+
+function drawRadar() {
+  const w = radarCanvas.width;
+  const h = radarCanvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const R = Math.min(w, h) / 2 - 6;
+  const beamWidth = 34;
+
+  radarCtx.clearRect(0, 0, w, h);
+  radarCtx.save();
+  radarCtx.translate(cx, cy);
+  radarCtx.beginPath();
+  radarCtx.arc(0, 0, R, 0, Math.PI * 2);
+  radarCtx.clip();
+
+  radarCtx.fillStyle = 'rgba(1, 15, 9, 0.18)';
+  radarCtx.fillRect(-R, -R, R * 2, R * 2);
+
+  for (let r = 1; r <= 8; r++) {
+    radarCtx.strokeStyle = r % 2 === 0 ? 'rgba(53,255,158,0.28)' : 'rgba(53,255,158,0.14)';
+    radarCtx.lineWidth = r % 2 === 0 ? 1.2 : 0.8;
+    radarCtx.beginPath();
+    radarCtx.arc(0, 0, R * r / 8, 0, Math.PI * 2);
+    radarCtx.stroke();
+  }
+
+  for (let a = 0; a < 360; a += 30) {
+    const rad = a * Math.PI / 180;
+    radarCtx.strokeStyle = 'rgba(53,255,158,0.18)';
+    radarCtx.lineWidth = 1;
+    radarCtx.beginPath();
+    radarCtx.moveTo(0, 0);
+    radarCtx.lineTo(R * Math.sin(rad), -R * Math.cos(rad));
+    radarCtx.stroke();
+  }
+
+  const sweepRad = sweepAngle * Math.PI / 180;
+  radarCtx.save();
+  radarCtx.beginPath();
+  radarCtx.moveTo(0, 0);
+  const a0 = sweepRad - beamWidth * Math.PI / 180;
+  const a1 = sweepRad;
+  radarCtx.arc(0, 0, R, a0 - Math.PI / 2, a1 - Math.PI / 2, false);
+  radarCtx.closePath();
+  const wedgeGrad = radarCtx.createLinearGradient(
+    R * Math.sin(a0), -R * Math.cos(a0),
+    R * Math.sin(a1), -R * Math.cos(a1)
+  );
+  wedgeGrad.addColorStop(0, 'rgba(125,255,240,0)');
+  wedgeGrad.addColorStop(1, 'rgba(125,255,240,0.55)');
+  radarCtx.fillStyle = wedgeGrad;
+  radarCtx.fill();
+  radarCtx.restore();
+
+  radarCtx.save();
+  radarCtx.strokeStyle = 'rgba(220,255,250,0.95)';
+  radarCtx.lineWidth = 2;
+  radarCtx.shadowColor = '#9dfff0';
+  radarCtx.shadowBlur = 10;
+  radarCtx.beginPath();
+  radarCtx.moveTo(0, 0);
+  radarCtx.lineTo(R * Math.sin(sweepRad), -R * Math.cos(sweepRad));
+  radarCtx.stroke();
+  radarCtx.restore();
+
+  radarTargets.forEach((target) => {
+    target.radius += target.speed * 0.0015;
+    if (target.radius > 0.95) target.radius = 0.95;
+    if (target.radius < 0.15) target.radius = 0.15;
+    target.angle = (target.angle + 0.02) % 360;
+
+    const d = Math.abs(((target.angle - sweepAngle + 540) % 360) - 180);
+    const active = d < beamWidth;
+    target.intensity = active ? 1 : Math.max(0.35, target.intensity * 0.985);
+
+    const rad = target.angle * Math.PI / 180;
+    const px = R * target.radius * Math.sin(rad);
+    const py = -R * target.radius * Math.cos(rad);
+
+    radarCtx.save();
+    radarCtx.translate(px, py);
+    radarCtx.rotate(rad + target.heading * Math.PI / 180 * 0.15);
+    radarCtx.fillStyle = `rgba(230,255,240,${target.intensity})`;
+    radarCtx.shadowColor = 'rgba(125,255,200,0.9)';
+    radarCtx.shadowBlur = 8 * target.intensity;
+    radarCtx.beginPath();
+    radarCtx.moveTo(0, -6);
+    radarCtx.lineTo(4, 5);
+    radarCtx.lineTo(0, 2);
+    radarCtx.lineTo(-4, 5);
+    radarCtx.closePath();
+    radarCtx.fill();
+    radarCtx.restore();
+  });
+
+  radarCtx.fillStyle = 'rgba(53,255,158,0.9)';
+  radarCtx.beginPath();
+  radarCtx.arc(0, 0, 3, 0, Math.PI * 2);
+  radarCtx.fill();
+
+  radarCtx.restore();
+
+  radarCtx.strokeStyle = 'rgba(53,255,158,0.85)';
+  radarCtx.lineWidth = 2.5;
+  radarCtx.shadowColor = 'rgba(53,255,158,0.6)';
+  radarCtx.shadowBlur = 6;
+  radarCtx.beginPath();
+  radarCtx.arc(cx, cy, R, 0, Math.PI * 2);
+  radarCtx.stroke();
+  radarCtx.shadowBlur = 0;
+
+  radarCtx.fillStyle = 'rgba(200,255,225,0.85)';
+  radarCtx.font = '9px Courier New';
+  radarCtx.textAlign = 'center';
+  radarCtx.textBaseline = 'middle';
+  for (let a = 0; a < 360; a += 30) {
+    const rad = a * Math.PI / 180;
+    const lx = cx + (R + 13) * Math.sin(rad);
+    const ly = cy - (R + 13) * Math.cos(rad);
+    radarCtx.fillText(String(a).padStart(3, '0'), lx, ly);
+  }
+
+  sweepAngle = (sweepAngle + SWEEP_SPEED) % 360;
+  document.getElementById('sweepBrg').textContent = String(Math.round(sweepAngle)).padStart(3, '0');
+  document.getElementById('trackCount').textContent = radarTargets.length;
+  requestAnimationFrame(drawRadar);
+}
+
+drawRadar();
+
+function tickClock(){
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    [now.getUTCHours(),now.getUTCMinutes(),now.getUTCSeconds()]
+      .map(v=>String(v).padStart(2,'0')).join(':');
+}
+setInterval(tickClock,1000);
+tickClock();
+
+function buildBars(container, count){
+  const bars=[];
+  for(let i=0;i<count;i++){ const d=document.createElement('div'); container.appendChild(d); bars.push(d);} return bars;
+}
+const pixelCells=[];
+for(let i=0;i<30;i++){ const d=document.createElement('div'); pixelGrid.appendChild(d); pixelCells.push(d);} 
+function flickerPixels(){ pixelCells.forEach(c=>{ const lit=Math.random()<0.35; c.style.background=lit ? 'rgba(53,255,158,0.8)' : 'rgba(53,255,158,0.10)'; c.style.boxShadow=lit ? '0 0 5px rgba(53,255,158,0.8)' : 'none';}); }
+setInterval(flickerPixels,500); flickerPixels();
+
+const eqLeftBars=buildBars(eqLeft,8);
+const eqRightBars=buildBars(eqRight,8);
+const specBars=buildBars(spectrum,64);
+function animateBars(bars){ bars.forEach(b=>{ b.style.height=(10 + Math.random()*90) + '%'; }); }
+setInterval(()=>{ animateBars(eqLeftBars); animateBars(eqRightBars); animateBars(specBars); },220);
+animateBars(eqLeftBars); animateBars(eqRightBars); animateBars(specBars);

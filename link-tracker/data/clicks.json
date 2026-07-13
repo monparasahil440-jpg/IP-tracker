@@ -1,23 +1,46 @@
 {
-  "mrj2er4yu4jzsd": [
+  "mrja0po5zla0pd": [
     {
-      "at": "2026-07-13T10:14:09.560Z",
+      "at": "2026-07-13T13:47:05.030Z",
       "ip": "::1",
       "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
       "ref": "http://127.0.0.1:5500/"
     },
     {
-      "at": "2026-07-13T10:14:09.594Z",
+      "at": "2026-07-13T13:47:05.068Z",
       "client": {
         "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
         "battery": {
-          "level": 0.8,
+          "level": 0.49,
           "charging": true
         },
         "location": {
-          "latitude": 21.228866439553602,
-          "longitude": 72.81157746437677,
-          "accuracy": 157
+          "latitude": 21.229015741618525,
+          "longitude": 72.81105087226932,
+          "accuracy": 156
+        }
+      }
+    }
+  ],
+  "mrjaq0e3lupigm": [
+    {
+      "at": "2026-07-13T14:06:44.588Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://127.0.0.1:5500/"
+    },
+    {
+      "at": "2026-07-13T14:06:44.628Z",
+      "client": {
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "battery": {
+          "level": 0.81,
+          "charging": true
+        },
+        "location": {
+          "latitude": 21.22896722454143,
+          "longitude": 72.8111536158243,
+          "accuracy": 124
         }
       }
     }
