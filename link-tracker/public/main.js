@@ -2,16 +2,21 @@
 // - If opened from file:// or served by a local static server (e.g. Live Server on :5500),
 //   point API calls to the running Node server at http://localhost:3000
 // - Otherwise use same-origin relative URLs (when the Express server is serving the UI)
-const API_BASE = (location.protocol === 'file:' || String(location.port) === '5500') ? 'http://localhost:3000' : '';
+const isLocalDevServer = location.protocol === 'file:' || (['localhost', '127.0.0.1', '0.0.0.0'].includes(location.hostname) && location.port && location.port !== '3000');
+const API_BASE = isLocalDevServer ? 'http://localhost:3000' : '';
 
 async function createLink(target) {
   const res = await fetch(`${API_BASE}/create`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target, base: (API_BASE || window.location.origin) }) });
-  return await res.json();
+  const text = await res.text();
+  if (!res.ok) throw new Error(text);
+  return JSON.parse(text);
 }
 
 async function listLinks() {
   const res = await fetch(`${API_BASE}/links`);
-  return await res.json();
+  const text = await res.text();
+  if (!res.ok) throw new Error(text);
+  return JSON.parse(text);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -36,11 +41,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   async function refreshList(){
-    const links = await listLinks();
-    linksList.innerHTML = Object.keys(links).length ? Object.entries(links).map(([id,l])=>{
-      const base = API_BASE || '';
-      return `<div class="linkItem"><div><strong>${id}</strong> — <a href="${base}/r/${id}" target="_blank">${base}/r/${id}</a></div><div class="small">${l.target}</div><div style="margin-top:6px"><a href="${base}/admin/${id}" target="_blank">Admin</a> · <a href="#" data-id="${id}" class="deleteLink">Delete</a></div></div>`
-    }).join('') : '<div>No links yet</div>';
+    try {
+      const links = await listLinks();
+      linksList.innerHTML = Object.keys(links).length ? Object.entries(links).map(([id,l])=>{
+        const base = API_BASE || '';
+        return `<div class="linkItem"><div><strong>${id}</strong> — <a href="${base}/r/${id}" target="_blank">${base}/r/${id}</a></div><div class="small">${l.target}</div><div style="margin-top:6px"><a href="${base}/admin/${id}" target="_blank">Admin</a> · <a href="#" data-id="${id}" class="deleteLink">Delete</a></div></div>`
+      }).join('') : '<div>No links yet</div>';
+    } catch (err) {
+      console.error('Failed to load links:', err);
+      linksList.innerHTML = `<div class="error">Failed to load links. Please check the backend or set the correct API base.</div>`;
+      return;
+    }
+
     // Attach delete handlers
     document.querySelectorAll('.deleteLink').forEach(a=>{
       a.addEventListener('click', async (e)=>{
