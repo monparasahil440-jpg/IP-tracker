@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Link Tracker — Admin</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
@@ -17,6 +17,7 @@
 
     <section id="result" class="hidden">
       <h2 id="linkTarget">-</h2>
+      <div style="margin-top:8px;margin-bottom:8px"><button id="deleteLinkBtn" style="background:#ef4444;color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer">Delete this link</button></div>
       <p>Created: <span id="createdAt">-</span></p>
       <div id="map" class="map"></div>
       <h3>Clicks</h3>
@@ -24,6 +25,6 @@
     </section>
   </main>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/admin.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>

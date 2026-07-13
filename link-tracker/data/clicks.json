@@ -1,157 +1,23 @@
 {
-  "mrit32g1q89c33": [
+  "mrj2er4yu4jzsd": [
     {
-      "at": "2026-07-13T05:53:10.684Z",
-      "ip": "::1",
-      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-      "ref": ""
-    },
-    {
-      "at": "2026-07-13T05:54:14.659Z",
-      "ip": "::1",
-      "ua": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.8655",
-      "ref": ""
-    }
-  ],
-  "mritel3h6hpwp7": [
-    {
-      "at": "2026-07-13T06:02:19.660Z",
+      "at": "2026-07-13T10:14:09.560Z",
       "ip": "::1",
       "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-      "ref": ""
-    }
-  ],
-  "mritqahvp1m51p": [
-    {
-      "at": "2026-07-13T06:11:17.893Z",
-      "ip": "::1",
-      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 Edg/150.0.0.0",
-      "ref": ""
-    }
-  ],
-  "mrit2wb6s3rqeu": [
-    {
-      "at": "2026-07-13T06:22:45.708Z",
-      "ip": "::1",
-      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-      "ref": "http://localhost:3000/"
+      "ref": "http://127.0.0.1:5500/"
     },
     {
-      "at": "2026-07-13T06:22:45.748Z",
+      "at": "2026-07-13T10:14:09.594Z",
       "client": {
         "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
         "battery": {
-          "level": 0.73,
+          "level": 0.8,
           "charging": true
         },
         "location": {
-          "latitude": 21.22905063664164,
-          "longitude": 72.81117146204623,
-          "accuracy": 137
-        }
-      }
-    }
-  ],
-  "mriu6tfkegepsk": [
-    {
-      "at": "2026-07-13T06:25:28.954Z",
-      "ip": "::1",
-      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-      "ref": ""
-    },
-    {
-      "at": "2026-07-13T06:25:29.183Z",
-      "client": {
-        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-        "battery": {
-          "level": 0.77,
-          "charging": true
-        }
-      }
-    }
-  ],
-  "mriuj4al59dobp": [
-    {
-      "at": "2026-07-13T06:33:26.757Z",
-      "ip": "::1",
-      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-      "ref": "http://localhost:3000/"
-    },
-    {
-      "at": "2026-07-13T06:33:26.802Z",
-      "client": {
-        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-        "battery": {
-          "level": 0.85,
-          "charging": true
-        },
-        "location": {
-          "latitude": 21.229063,
-          "longitude": 72.811455,
-          "accuracy": 269
-        }
-      }
-    }
-  ],
-  "mrizxir9k2fik4": [
-    {
-      "at": "2026-07-13T09:09:03.282Z",
-      "ip": "152.59.34.223",
-      "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36",
-      "ref": "https://vz1q1d3z-3000.inc1.devtunnels.ms/r/mrizxir9k2fik4"
-    },
-    {
-      "at": "2026-07-13T09:09:03.688Z",
-      "client": {
-        "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36",
-        "battery": {
-          "level": 0.53,
-          "charging": true
-        }
-      }
-    },
-    {
-      "at": "2026-07-13T09:10:04.407Z",
-      "ip": "152.59.34.223",
-      "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36",
-      "ref": ""
-    },
-    {
-      "at": "2026-07-13T09:10:04.551Z",
-      "client": {
-        "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36",
-        "battery": {
-          "level": 0.54,
-          "charging": true
-        },
-        "location": {
-          "latitude": 21.2289016,
-          "longitude": 72.8115219,
-          "accuracy": 16.42099952697754
-        }
-      }
-    }
-  ],
-  "mrj0c6xu8i90mu": [
-    {
-      "at": "2026-07-13T09:16:11.445Z",
-      "ip": "2409:40c1:10dd:7727:1c18:1bff:fe4c:4fd5",
-      "ua": "WhatsApp/2.23.20.0",
-      "ref": ""
-    },
-    {
-      "at": "2026-07-13T09:16:16.859Z",
-      "ip": "2409:40c1:10dd:7727:1c18:1bff:fe4c:4fd5",
-      "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36",
-      "ref": ""
-    },
-    {
-      "at": "2026-07-13T09:16:17.120Z",
-      "client": {
-        "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36",
-        "battery": {
-          "level": 0.6,
-          "charging": true
+          "latitude": 21.228866439553602,
+          "longitude": 72.81157746437677,
+          "accuracy": 157
         }
       }
     }

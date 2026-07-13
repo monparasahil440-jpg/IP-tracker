@@ -9,6 +9,20 @@ app.use(express.json());
 // URLs use the original host/protocol (not `localhost`).
 app.set('trust proxy', true);
 
+// Simple CORS handling to allow the UI to be served from a different origin
+// during development (e.g. Live Server or file://). For production, restrict
+// origins as appropriate.
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Allow common methods including DELETE for preflight requests during development
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  // Allow credentials if you need them (set to specific origin in production)
+  // res.setHeader('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
 const DATA_DIR = path.resolve(__dirname, 'data');
 const LINKS_FILE = path.join(DATA_DIR, 'links.json');
 const CLICKS_FILE = path.join(DATA_DIR, 'clicks.json');
@@ -217,6 +231,28 @@ app.get('/', (req, res) => {
 app.get('/links', (req, res) => {
   const links = readJson(LINKS_FILE);
   res.json(links);
+});
+
+// Delete all links and clicks (wipe history)
+app.delete('/links', (req, res) => {
+  writeJson(LINKS_FILE, {});
+  writeJson(CLICKS_FILE, {});
+  res.json({ ok: true });
+});
+
+// Delete a single link and its clicks
+app.delete('/links/:id', (req, res) => {
+  const id = req.params.id;
+  const links = readJson(LINKS_FILE);
+  if (!links[id]) return res.status(404).json({ error: 'not found' });
+  delete links[id];
+  writeJson(LINKS_FILE, links);
+  const clicks = readJson(CLICKS_FILE);
+  if (clicks[id]) {
+    delete clicks[id];
+    writeJson(CLICKS_FILE, clicks);
+  }
+  res.json({ ok: true });
 });
 
 const PORT = process.env.PORT || 3000;

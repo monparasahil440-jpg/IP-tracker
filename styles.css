@@ -136,6 +136,28 @@ button {
   margin-bottom: 6px;
 }
 
+.link-tracker-link {
+  margin-bottom: 18px;
+  padding: 16px 20px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 18px;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.link-tracker-link p {
+  margin: 0 0 8px;
+  color: #dbeafe;
+}
+
+.link-tracker-link a {
+  color: #0f172a;
+  background: #38bdf8;
+  padding: 10px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
 @media (max-width: 600px) {
   .card {
     padding: 24px;

@@ -1,10 +1,16 @@
+// Choose API base depending on how the UI is served:
+// - If opened from file:// or served by a local static server (e.g. Live Server on :5500),
+//   point API calls to the running Node server at http://localhost:3000
+// - Otherwise use same-origin relative URLs (when the Express server is serving the UI)
+const API_BASE = (location.protocol === 'file:' || String(location.port) === '5500') ? 'http://localhost:3000' : '';
+
 async function createLink(target) {
-  const res = await fetch('/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target, base: window.location.origin }) });
+  const res = await fetch(`${API_BASE}/create`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target, base: (API_BASE || window.location.origin) }) });
   return await res.json();
 }
 
 async function listLinks() {
-  const res = await fetch('/links');
+  const res = await fetch(`${API_BASE}/links`);
   return await res.json();
 }
 
@@ -23,7 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await createLink(target);
     created.classList.remove('hidden');
     createdUrl.href = data.url; createdUrl.textContent = data.url;
-    adminUrl.href = `/admin/${data.id}`; adminUrl.textContent = `/admin/${data.id}`;
+    const adminPath = `${API_BASE || ''}/admin/${data.id}`;
+    adminUrl.href = adminPath; adminUrl.textContent = adminPath;
     targetInput.value = '';
     await refreshList();
   });
@@ -31,9 +38,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function refreshList(){
     const links = await listLinks();
     linksList.innerHTML = Object.keys(links).length ? Object.entries(links).map(([id,l])=>{
-      return `<div class="linkItem"><div><strong>${id}</strong> — <a href="/r/${id}" target="_blank">/r/${id}</a></div><div class="small">${l.target}</div><div style="margin-top:6px"><a href="/admin/${id}" target="_blank">Admin</a></div></div>`
+      const base = API_BASE || '';
+      return `<div class="linkItem"><div><strong>${id}</strong> — <a href="${base}/r/${id}" target="_blank">${base}/r/${id}</a></div><div class="small">${l.target}</div><div style="margin-top:6px"><a href="${base}/admin/${id}" target="_blank">Admin</a> · <a href="#" data-id="${id}" class="deleteLink">Delete</a></div></div>`
     }).join('') : '<div>No links yet</div>';
+    // Attach delete handlers
+    document.querySelectorAll('.deleteLink').forEach(a=>{
+      a.addEventListener('click', async (e)=>{
+        e.preventDefault();
+        const id = a.getAttribute('data-id');
+        if (!confirm('Delete this link and its history?')) return;
+        await deleteLink(id);
+        await refreshList();
+      });
+    });
   }
+
+  async function deleteLink(id){
+    const res = await fetch(`${API_BASE}/links/${id}`, { method: 'DELETE' });
+    return res.ok;
+  }
+
+  const deleteAllBtn = document.getElementById('deleteAllBtn');
+  if (deleteAllBtn) deleteAllBtn.addEventListener('click', async ()=>{
+    if (!confirm('Delete all links and click history? This cannot be undone.')) return;
+    const res = await fetch(`${API_BASE}/links`, { method: 'DELETE' });
+    if (res.ok) await refreshList(); else alert('Failed to delete all');
+  });
 
   await refreshList();
 });

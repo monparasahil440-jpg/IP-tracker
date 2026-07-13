@@ -52,5 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     initMap(foundCoords?.latitude, foundCoords?.longitude);
+    const deleteBtn = document.getElementById('deleteLinkBtn');
+    if (deleteBtn) {
+      deleteBtn.onclick = async () => {
+        if (!confirm('Delete this link and its history?')) return;
+        const id = viewId.value.trim();
+        const res = await fetch(`/links/${id}`, { method: 'DELETE' });
+        if (res.ok) { alert('Deleted'); result.classList.add('hidden'); } else alert('Failed to delete');
+      };
+    }
   });
 });
