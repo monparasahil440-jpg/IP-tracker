@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IP Tracker</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <h1>IP Tracker</h1>
+        <p class="subtitle">Look up the location and network details for any IP address.</p>
+
+        <div class="search-box">
+          <input id="ipInput" type="text" placeholder="Enter IP address or leave blank for your own" />
+          <button id="trackBtn">Track</button>
+          <button id="locateBtn" class="secondary-btn">Use my location</button>
+        </div>
+
+        <div id="status" class="status">Loading your public IP…</div>
+
+        <div id="result" class="result hidden">
+          <div class="result-header">
+            <h2 id="ipValue">-</h2>
+            <span id="countryValue" class="badge">-</span>
+          </div>
+
+          <div id="map" class="map"></div>
+
+          <div class="details-grid">
+            <div class="detail-card">
+              <span class="label">City</span>
+              <strong id="cityValue">-</strong>
+            </div>
+            <div class="detail-card">
+              <span class="label">Region</span>
+              <strong id="regionValue">-</strong>
+            </div>
+            <div class="detail-card">
+              <span class="label">Country</span>
+              <strong id="countryNameValue">-</strong>
+            </div>
+            <div class="detail-card">
+              <span class="label">Timezone</span>
+              <strong id="timezoneValue">-</strong>
+            </div>
+            <div class="detail-card">
+              <span class="label">Organization</span>
+              <strong id="orgValue">-</strong>
+            </div>
+            <div class="detail-card">
+              <span class="label">Coordinates</span>
+              <strong id="coordsValue">-</strong>
+            </div>
+            <div class="detail-card">
+              <span class="label">Accuracy</span>
+              <strong id="accuracyValue">-</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="script.js"></script>
+  </body>
+</html>

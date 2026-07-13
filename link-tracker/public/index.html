@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Link Tracker — Create</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Link Tracker</h1>
+    <p>Create a tracking link and view existing links.</p>
+
+    <form id="createForm">
+      <input id="target" placeholder="https://example.com" required style="width:60%" />
+      <button type="submit">Create</button>
+    </form>
+
+    <div id="created" class="hidden">
+      <p>Created link: <a id="createdUrl" href="#" target="_blank"></a></p>
+      <p>Admin view: <a id="adminUrl" href="#" target="_blank"></a></p>
+    </div>
+
+    <h2>Your Links</h2>
+    <div id="linksList">Loading…</div>
+  </main>
+  <script src="/main.js"></script>
+</body>
+</html>

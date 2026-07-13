@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Link Tracker — Admin</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Admin — View Clicks</h1>
+    <form id="viewForm">
+      <input id="viewId" placeholder="Enter link id (e.g. abc123)" style="width:40%" />
+      <button type="submit">View</button>
+    </form>
+
+    <section id="result" class="hidden">
+      <h2 id="linkTarget">-</h2>
+      <p>Created: <span id="createdAt">-</span></p>
+      <div id="map" class="map"></div>
+      <h3>Clicks</h3>
+      <ul id="clicks"></ul>
+    </section>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>
