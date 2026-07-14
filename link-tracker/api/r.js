@@ -34,51 +34,56 @@ async function getIpDetails(ip) {
 }
 
 module.exports = async (req, res) => {
-  if (req.method !== 'GET') {
-    res.status(405).send('Method Not Allowed');
-    return;
-  }
+  try {
+    if (req.method !== 'GET') {
+      res.status(405).send('Method Not Allowed');
+      return;
+    }
 
-  const { id } = req.query;
-  const links = getLinks();
-  const meta = links[id];
-  if (!meta) {
-    res.status(404).send('Link not found');
-    return;
-  }
+    const { id } = req.query;
+    const links = getLinks();
+    const meta = links[id];
+    if (!meta) {
+      res.status(404).send('Link not found');
+      return;
+    }
 
-  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
-  const ua = req.headers['user-agent'] || '';
-  const ref = req.headers.referer || '';
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const ua = req.headers['user-agent'] || '';
+    const ref = req.headers.referer || '';
 
-  // Silent tracking
-  const ipDetails = await getIpDetails(ip);
-  const clicks = getClicks();
-  if (!clicks[id]) clicks[id] = [];
-  
-  const clickRecord = {
-    at: new Date().toISOString(),
-    ip,
-    ua,
-    ref,
-    silent: true
-  };
-
-  if (ipDetails) {
-    clickRecord.ipDetails = {
-      country: ipDetails.country,
-      city: ipDetails.city,
-      region: ipDetails.region,
-      latitude: ipDetails.latitude,
-      longitude: ipDetails.longitude,
-      org: ipDetails.connection?.org || ipDetails.org,
-      isLocal: !!ipDetails.isLocal
+    // Silent tracking
+    const ipDetails = await getIpDetails(ip);
+    const clicks = getClicks();
+    if (!clicks[id]) clicks[id] = [];
+    
+    const clickRecord = {
+      at: new Date().toISOString(),
+      ip,
+      ua,
+      ref,
+      silent: true
     };
+
+    if (ipDetails) {
+      clickRecord.ipDetails = {
+        country: ipDetails.country,
+        city: ipDetails.city,
+        region: ipDetails.region,
+        latitude: ipDetails.latitude,
+        longitude: ipDetails.longitude,
+        org: ipDetails.connection?.org || ipDetails.org,
+        isLocal: !!ipDetails.isLocal
+      };
+    }
+
+    clicks[id].push(clickRecord);
+    saveClicks(clicks);
+
+    // Redirect immediately
+    res.redirect(meta.target);
+  } catch (error) {
+    console.error('Redirect Error:', error);
+    res.status(500).send('Internal Server Error: ' + error.message);
   }
-
-  clicks[id].push(clickRecord);
-  saveClicks(clicks);
-
-  // Redirect immediately
-  res.redirect(meta.target);
 };
