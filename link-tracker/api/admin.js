@@ -1,23 +1,26 @@
-const { getLinks, getClicks } = require('./_storage');
+const { getLinks, getClicks, decodeStatelessId } = require('./_storage');
 
 module.exports = async (req, res) => {
   try {
-    if (req.method !== 'GET') {
-      res.status(405).send('Method Not Allowed');
-      return;
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: 'id required' });
+
+    const links = getLinks();
+    let link = links[id];
+
+    // If not in storage, recover metadata from ID
+    if (!link) {
+      const target = decodeStatelessId(id);
+      if (target) {
+        link = { target, createdAt: 'Recovered from Link', isRecovered: true };
+      }
     }
 
-    const { id } = req.query;
-    const links = getLinks();
-    const link = links[id];
-    if (!link) {
-      return res.status(404).json({ error: 'not found' });
-    }
+    if (!link) return res.status(404).json({ error: 'not found' });
 
     const clicks = getClicks();
     res.json({ id, link, clicks: clicks[id] || [] });
   } catch (error) {
-    console.error('API Admin Error:', error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };

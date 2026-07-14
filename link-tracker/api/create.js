@@ -1,4 +1,4 @@
-const { getLinks, saveLinks, makeId, getBaseUrl } = require('./_storage');
+const { getLinks, saveLinks, getBaseUrl, encodeStatelessId } = require('./_storage');
 
 module.exports = async (req, res) => {
   try {
@@ -13,7 +13,11 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const id = makeId();
+    // On Vercel, we use stateless IDs so the link never breaks
+    const id = encodeStatelessId(target);
+    
+    // We still try to save it for the session dashboard, but the link itself 
+    // will work even if this file is deleted later.
     const links = getLinks();
     links[id] = { target, note: req.body?.note || null, createdAt: new Date().toISOString() };
     saveLinks(links);
@@ -29,14 +33,11 @@ module.exports = async (req, res) => {
           if (ru.protocol === su.protocol && ru.host === su.host) base = `${su.protocol}//${su.host}`;
         }
       }
-    } catch (e) {
-      base = null;
-    }
+    } catch (e) { base = null; }
 
     if (!base) base = getBaseUrl(req);
     res.json({ id, url: `${base}/r/${id}` });
   } catch (error) {
-    console.error('API Create Error:', error);
     res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 };
