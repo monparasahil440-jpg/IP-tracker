@@ -177,6 +177,15 @@ input:not(:placeholder-shown):invalid {
   color: #ffe7e7;
 }
 
+.activity-panel { margin: 18px 0 0; border: 1px solid rgba(0,255,120,.2); background: #020707; overflow: hidden; }
+.activity-panel-header { display:flex; justify-content:space-between; gap:12px; padding:10px 14px; border-bottom:1px solid rgba(0,255,120,.17); color:#a8ffd1; font-size:.72rem; letter-spacing:.09em; }
+.activity-label { color:#6b9d7b; }
+.activity-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.activity-card { min-height:125px; padding:12px; border-right:1px solid rgba(0,255,120,.15); }
+.activity-card:last-child { border-right:0; }
+.activity-card h3 { margin:0 0 10px; color:#8ae8c8; font-size:.68rem; font-weight:500; letter-spacing:.07em; }
+.activity-output { color:#b9d6c2; font-size:.72rem; line-height:1.65; word-break:break-word; }
+
 .hidden { display: none; }
 
 #linksList {
@@ -397,5 +406,8 @@ small { color: #94ffd1; }
   .container { padding: 16px; }
 
   form { flex-direction: column; }
+  .activity-grid { grid-template-columns:1fr; }
+  .activity-card { min-height:0; border-right:0; border-bottom:1px solid rgba(0,255,120,.15); }
+  .activity-card:last-child { border-bottom:0; }
 }
 

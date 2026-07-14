@@ -1,47 +1,156 @@
 {
-  "mrja0po5zla0pd": [
+  "mrkndmu9xnsyk6": [
     {
-      "at": "2026-07-13T13:47:05.030Z",
+      "at": "2026-07-14T12:48:55.934Z",
       "ip": "::1",
       "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-      "ref": "http://127.0.0.1:5500/"
-    },
-    {
-      "at": "2026-07-13T13:47:05.068Z",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
       "client": {
-        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-        "battery": {
-          "level": 0.49,
-          "charging": true
-        },
         "location": {
-          "latitude": 21.229015741618525,
-          "longitude": 72.81105087226932,
+          "latitude": 21.229063,
+          "longitude": 72.811455,
+          "accuracy": 269
+        }
+      }
+    }
+  ],
+  "mrknf3guj7di8m": [
+    {
+      "at": "2026-07-14T12:50:01.682Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "location": {
+          "latitude": 21.228986796344422,
+          "longitude": 72.81102476476718,
           "accuracy": 156
         }
       }
     }
   ],
-  "mrjaq0e3lupigm": [
+  "mrknheauwgbgq3": [
     {
-      "at": "2026-07-13T14:06:44.588Z",
+      "at": "2026-07-14T12:51:43.793Z",
       "ip": "::1",
       "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-      "ref": "http://127.0.0.1:5500/"
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "location": {
+          "latitude": 21.228958594797003,
+          "longitude": 72.81115500866497,
+          "accuracy": 119
+        }
+      }
+    }
+  ],
+  "mrknq4nxgrfie2": [
+    {
+      "at": "2026-07-14T12:58:42.613Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "location": {
+          "latitude": 21.228955343954855,
+          "longitude": 72.81125688394864,
+          "accuracy": 127
+        }
+      }
+    }
+  ],
+  "mrkns1di0kjxre": [
+    {
+      "at": "2026-07-14T13:00:12.868Z",
+      "ip": "::ffff:127.0.0.1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "ref": "",
+      "consent": {
+        "basic": true,
+        "location": false
+      }
+    }
+  ],
+  "mrknt97e5d3lbq": [
+    {
+      "at": "2026-07-14T13:01:23.291Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "ref": "",
+      "consent": {
+        "basic": true,
+        "location": false
+      }
     },
     {
-      "at": "2026-07-13T14:06:44.628Z",
-      "client": {
-        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
-        "battery": {
-          "level": 0.81,
-          "charging": true
-        },
-        "location": {
-          "latitude": 21.22896722454143,
-          "longitude": 72.8111536158243,
-          "accuracy": 124
-        }
+      "at": "2026-07-14T13:02:44.624Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "ref": "",
+      "consent": {
+        "basic": true,
+        "location": false
+      }
+    }
+  ],
+  "mrkwf4x2zjqoed": [
+    {
+      "at": "2026-07-14T17:01:58.612Z",
+      "ip": "::1",
+      "ua": "curl/8.5.0",
+      "ref": "",
+      "silent": true
+    }
+  ],
+  "mrkwj7qudrn7bw": [
+    {
+      "at": "2026-07-14T17:05:11.745Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "",
+      "silent": true
+    }
+  ],
+  "mrkwjyqa8xox9m": [
+    {
+      "at": "2026-07-14T17:05:45.459Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "",
+      "silent": true
+    }
+  ],
+  "mrkwntcfyck4dx": [
+    {
+      "at": "2026-07-14T17:08:43.816Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "",
+      "silent": true,
+      "ipDetails": {
+        "country": "Local Network",
+        "city": "Testing Environment",
+        "region": "N/A",
+        "latitude": 0,
+        "longitude": 0,
+        "org": "Internal / Localhost",
+        "isLocal": true
       }
     }
   ]

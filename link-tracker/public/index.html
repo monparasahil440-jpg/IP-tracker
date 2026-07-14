@@ -3,31 +3,38 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Link Tracker — Create</title>
+  <title>Family Link Sharing</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="container">
     <div class="top-panel">
-      <h1>Link Tracker</h1>
+      <h1>Family Link Sharing</h1>
       <div class="pill-row">
         <span class="status-pill">MONITOR MODE</span>
         <span class="status-pill alt">AIM LOCKED</span>
       </div>
     </div>
-    <p>Create a tracking link and view existing links.</p>
+    <p>Create a consent-based sharing link. Visitors choose whether to share basic visit information or their current location before continuing.</p>
+
+    <p style="margin: 8px 0 16px;"><a href="/ip-tracker/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 600;">Open IP Tracker</a></p>
 
     <div class="tracker-grid">
       <div class="tracker-form">
         <form id="createForm">
-          <input id="target" placeholder="https://example.com" required />
-          <button type="submit">Create</button>
+          <input id="target" type="url" placeholder="https://example.com" required />
+          <button type="submit">Create family link</button>
         </form>
 
         <div id="created" class="hidden">
           <p>Created link: <a id="createdUrl" href="#" target="_blank"></a></p>
           <p>Admin view: <a id="adminUrl" href="#" target="_blank"></a></p>
         </div>
+
+        <section class="activity-panel" aria-label="Family link setup activity">
+          <div class="activity-panel-header"><span>FAMILY LINK ACTIVITY</span><span class="activity-label">SIMULATED STATUS</span></div>
+          <div id="activityGrid" class="activity-grid" aria-live="polite"></div>
+        </section>
       </div>
 
       <div class="radar-panel">

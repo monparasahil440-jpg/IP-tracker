@@ -116,6 +116,12 @@ button:hover {
   background: rgba(0, 255, 120, 0.18);
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+}
+
 .secondary-btn {
   background: rgba(65, 255, 211, 0.12);
   color: #d8fff4;
@@ -127,6 +133,41 @@ button:hover {
   min-height: 24px;
   letter-spacing: 0.04em;
 }
+
+.location-note {
+  margin: -4px 0 20px;
+  color: #89cfa0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.activity-panel {
+  margin: 0 0 20px;
+  border: 1px solid rgba(0, 255, 120, 0.2);
+  background: #020707;
+  overflow: hidden;
+}
+
+.activity-panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0, 255, 120, 0.17);
+  color: #a8ffd1;
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+}
+
+.activity-label { color: #6b9d7b; }
+
+.activity-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.activity-card { min-height: 125px; padding: 12px; border-right: 1px solid rgba(0, 255, 120, 0.15); }
+.activity-card:last-child { border-right: 0; }
+.activity-card h3 { margin: 0 0 10px; color: #8ae8c8; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.07em; }
+.activity-output { color: #b9d6c2; font-size: 0.72rem; line-height: 1.65; word-break: break-word; }
+.activity-output div::first-letter { color: #7dfff0; }
 
 .result {
   margin-top: 14px;
@@ -374,4 +415,8 @@ canvas{
   .search-box {
     flex-direction: column;
   }
+
+  .activity-grid { grid-template-columns: 1fr; }
+  .activity-card { min-height: 0; border-right: 0; border-bottom: 1px solid rgba(0, 255, 120, 0.15); }
+  .activity-card:last-child { border-bottom: 0; }
 }

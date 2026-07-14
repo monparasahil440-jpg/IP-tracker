@@ -17,6 +17,49 @@ const mapEl = document.getElementById("map");
 
 let map;
 let marker;
+const activityGrid = document.getElementById("activityGrid");
+let activityTimers = [];
+
+function showLookupActivity(value) {
+  if (!activityGrid) return;
+  activityTimers.forEach(window.clearTimeout);
+  activityTimers = [];
+
+  const target = value || "your public IP";
+  const cards = [
+    ["INPUT / VALIDATE", `[INPUT] Target received: ${target}`, "[CHECK] Validating public network address", "[READY] Request queued"],
+    ["NETWORK / LOOKUP", "[NET] Contacting location provider", "[DATA] Reading network metadata", "[MAP] Preparing approximate coordinates"],
+    ["RESULT / DISPLAY", "[UI] Updating location cards", "[MAP] Positioning map marker", "[DONE] Lookup workflow complete"],
+  ];
+
+  activityGrid.replaceChildren(...cards.map(([title]) => {
+    const card = document.createElement("article");
+    card.className = "activity-card";
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    const output = document.createElement("div");
+    output.className = "activity-output";
+    card.append(heading, output);
+    return card;
+  }));
+
+  const outputs = [...activityGrid.querySelectorAll(".activity-output")];
+  cards.forEach(([, ...lines], cardIndex) => {
+    lines.forEach((line, lineIndex) => {
+      activityTimers.push(window.setTimeout(() => {
+        const row = document.createElement("div");
+        row.textContent = line;
+        outputs[cardIndex].appendChild(row);
+      }, 180 + (cardIndex * 3 + lineIndex) * 230));
+    });
+  });
+}
+
+function setTrackingState(isTracking) {
+  trackBtn.disabled = isTracking;
+  locateBtn.disabled = isTracking;
+  trackBtn.textContent = isTracking ? "Tracking..." : "Track";
+}
 
 async function fetchPublicIp() {
   try {
@@ -59,6 +102,7 @@ function initMap(lat = 0, lon = 0) {
     } else {
       marker = L.marker([lat, lon]).addTo(map);
     }
+    window.setTimeout(() => map.invalidateSize(), 0);
     return;
   }
 
@@ -67,6 +111,7 @@ function initMap(lat = 0, lon = 0) {
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
   marker = L.marker([lat, lon]).addTo(map);
+  window.setTimeout(() => map.invalidateSize(), 0);
 }
 
 function renderDetails(data) {
@@ -85,6 +130,7 @@ function renderDetails(data) {
 
   if (lat != null && lon != null) {
     initMap(lat, lon);
+    marker.bindPopup(`<strong>${data.ip || "IP address"}</strong><br>${data.city || "Unknown city"}, ${data.country_name || "Unknown country"}`).openPopup();
   }
 
   resultEl.classList.remove("hidden");
@@ -114,6 +160,18 @@ function isPrivateIp(ip) {
   if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
   if (a === 192 && b === 168) return true; // 192.168.0.0/16
   return false;
+}
+
+function isValidIp(ip) {
+  if (!ip) return false;
+
+  if (ip.includes(":")) {
+    // Covers common full and compressed IPv6 notation.
+    return /^(?:(?:[\da-f]{1,4}:){1,7}:[\da-f]{0,4}|(?:[\da-f]{1,4}:){7}[\da-f]{1,4})$/i.test(ip);
+  }
+
+  const parts = ip.split(".");
+  return parts.length === 4 && parts.every((part) => /^(0|[1-9]\d{0,2})$/.test(part) && Number(part) <= 255);
 }
 
 function showDeviceLocation(position) {
@@ -148,19 +206,26 @@ function handleLocationError(error) {
 
 async function trackIp(inputValue = "") {
   const ip = inputValue.trim();
-
+  showLookupActivity(ip);
   if (!ip) {
-    resultEl.classList.remove("hidden");
-    ipValueEl.textContent = "-";
-    countryValueEl.textContent = "Unavailable";
-    cityValueEl.textContent = "-";
-    regionValueEl.textContent = "-";
-    countryNameValueEl.textContent = "-";
-    timezoneValueEl.textContent = "-";
-    orgValueEl.textContent = "-";
-    coordsValueEl.textContent = "-";
-    accuracyValueEl.textContent = "-";
-    updateStatus("Enter an IP address to look it up. You can also use your device location.");
+    updateStatus("Finding your public IP address...");
+    setTrackingState(true);
+    try {
+      const publicIp = await fetchPublicIp();
+      if (!publicIp) throw new Error("Unable to determine your public IP. Please enter an IP address instead.");
+      ipInput.value = publicIp;
+      return await trackIp(publicIp);
+    } catch (error) {
+      updateStatus(error.message || "Unable to determine your public IP.");
+      return;
+    } finally {
+      setTrackingState(false);
+    }
+  }
+
+  if (!isValidIp(ip)) {
+    updateStatus("Enter a valid public IPv4 or IPv6 address.");
+    ipInput.focus();
     return;
   }
 
@@ -180,6 +245,7 @@ async function trackIp(inputValue = "") {
   }
 
   updateStatus(`Looking up ${ip}...`);
+  setTrackingState(true);
 
   try {
     const details = await fetchIpDetails(ip);
@@ -198,6 +264,8 @@ async function trackIp(inputValue = "") {
     coordsValueEl.textContent = "-";
     accuracyValueEl.textContent = "-";
     updateStatus(error.message || "Something went wrong.");
+  } finally {
+    setTrackingState(false);
   }
 }
 
@@ -223,7 +291,7 @@ ipInput.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-  updateStatus("Enter an IP address to look it up, or use your device location.");
+  updateStatus("Enter a public IP address, or leave it blank to track your own public IP.");
 });
 
 /* ---------- radar scanner panel ---------- */

@@ -1,24 +1,17 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// When behind a reverse proxy, respect forwarded headers so generated
-// URLs use the original host/protocol (not `localhost`).
 app.set('trust proxy', true);
 
-// Simple CORS handling to allow the UI to be served from a different origin
-// during development (e.g. Live Server or file://). For production, restrict
-// origins as appropriate.
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  // Allow common methods including DELETE for preflight requests during development
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  // Allow credentials if you need them (set to specific origin in production)
-  // res.setHeader('Access-Control-Allow-Credentials', 'true');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
@@ -53,23 +46,51 @@ function makeId() {
 
 function getBaseUrl(req) {
   if (process.env.BASE_URL) return process.env.BASE_URL.replace(/\/$/, '');
-  // Prefer explicit Referer/Origin when available (matches the URL the user used)
   const referer = req.get('Referer') || req.get('Origin');
   if (referer) {
     try {
       const u = new URL(referer);
       return `${u.protocol}//${u.host}`;
-    } catch (e) {
-      // fall through
-    }
+    } catch (e) {}
   }
-  // Respect forwarded proto/host headers (set via proxy)
   const proto = (req.get('x-forwarded-proto') || req.protocol).split(',')[0];
   const host = req.get('x-forwarded-host') || req.get('host');
   return `${proto}://${host}`;
 }
 
-// API compatibility routes for local development and Vercel-style frontend
+async function getIpDetails(ip) {
+  return new Promise((resolve) => {
+    // Handle local IP addresses for testing
+    if (!ip || ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+      resolve({
+        success: true,
+        country: 'Local Network',
+        city: 'Testing Environment',
+        region: 'N/A',
+        latitude: 0,
+        longitude: 0,
+        connection: { org: 'Internal / Localhost' },
+        isLocal: true
+      });
+      return;
+    }
+    https.get(`https://ipwho.is/${ip}`, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          resolve(json.success ? json : null);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }).on('error', () => {
+      resolve(null);
+    });
+  });
+}
+
 app.post('/api/create', (req, res) => {
   const { target, note } = req.body;
   if (!target) return res.status(400).json({ error: 'target URL required' });
@@ -108,8 +129,7 @@ app.get('/api/create', (req, res) => {
   res.send(`${getBaseUrl(req)}/r/${id}`);
 });
 
-// Redirect route that logs the click and redirects to the target
-app.get('/r/:id', (req, res) => {
+app.get('/r/:id', async (req, res) => {
   const id = req.params.id;
   const links = readJson(LINKS_FILE);
   const meta = links[id];
@@ -119,94 +139,60 @@ app.get('/r/:id', (req, res) => {
   const ua = req.get('User-Agent') || '';
   const ref = req.get('Referer') || '';
 
+  // Silent tracking: get IP details and log immediately
+  const ipDetails = await getIpDetails(ip);
+  
   const clicks = readJson(CLICKS_FILE);
   if (!clicks[id]) clicks[id] = [];
-  clicks[id].push({
+  
+  const clickRecord = {
     at: new Date().toISOString(),
     ip,
     ua,
-    ref
-  });
+    ref,
+    silent: true
+  };
+
+  if (ipDetails) {
+    clickRecord.ipDetails = {
+      country: ipDetails.country,
+      city: ipDetails.city,
+      region: ipDetails.region,
+      latitude: ipDetails.latitude,
+      longitude: ipDetails.longitude,
+      org: ipDetails.connection?.org || ipDetails.org,
+      isLocal: !!ipDetails.isLocal
+    };
+  }
+
+  clicks[id].push(clickRecord);
   writeJson(CLICKS_FILE, clicks);
 
-  // Serve an interstitial page that requests permission for geolocation
-  // and battery info from the browser, posts it back to /collect, then redirects.
-  const escapedTarget = meta.target.replace(/'/g, "\\'");
-  res.send(`<!doctype html>
-  <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Redirecting...</title>
-    <style>body{font-family:system-ui,Arial;display:flex;align-items:center;justify-content:center;height:100vh;background:#f6f9fc;color:#0b1220} .card{max-width:720px;padding:20px;border-radius:12px;background:#fff;box-shadow:0 6px 24px rgba(3,10,18,.08);text-align:center}</style>
-  </head>
-  <body>
-    <div class="card">
-      <h2>Preparing to open link</h2>
-      <p>We will ask for permission to access location (optional) to help with family-safety reporting. You can decline and still continue.</p>
-      <p id="status">Requesting permissions…</p>
-    </div>
-    <script>
-      const id = '${id}';
-      const target = '${escapedTarget}';
-
-      function postData(payload) {
-        return fetch('/collect', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
-      }
-
-      async function gatherAndSend() {
-        const payload = { id, at: new Date().toISOString(), client: { ua: navigator.userAgent } };
-
-        // Battery (may be unsupported)
-        try {
-          if (navigator.getBattery) {
-            const bat = await navigator.getBattery();
-            payload.client.battery = { level: bat.level, charging: bat.charging };
-          }
-        } catch(e){}
-
-        // Geolocation (requires permission)
-        let geoSent = false;
-        const geoPromise = new Promise((resolve) => {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-              payload.client.location = { latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy };
-              geoSent = true;
-              resolve();
-            }, err => { resolve(); }, { enableHighAccuracy: true, timeout: 8000 });
-          } else {
-            resolve();
-          }
-        });
-
-        // Wait for geolocation or timeout
-        await Promise.race([geoPromise, new Promise(r => setTimeout(r, 9000))]);
-
-        await postData(payload);
-        document.getElementById('status').textContent = 'Opening link…';
-        // small delay so POST can be sent
-        setTimeout(()=>{ window.location.href = target; }, 600);
-      }
-
-      gatherAndSend();
-    </script>
-  </body>
-  </html>`);
+  // Redirect immediately
+  res.redirect(meta.target);
 });
 
-// Collect client-provided payload (location, battery, etc.)
 app.post(['/collect', '/api/collect'], (req, res) => {
-  const { id, at, client } = req.body || {};
+  const { id, at, client, consent } = req.body || {};
   if (!id) return res.status(400).json({ error: 'missing id' });
+
+  const location = client?.location;
+  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
 
   const clicks = readJson(CLICKS_FILE);
   if (!clicks[id]) clicks[id] = [];
-  clicks[id].push({ at: at || new Date().toISOString(), client });
+  clicks[id].push({
+    at: at || new Date().toISOString(),
+    ip,
+    ua: req.get('User-Agent') || client?.ua || '',
+    ref: typeof client?.referrer === 'string' ? client.referrer.slice(0, 2048) : '',
+    consent: consent || { basic: true, location: !!location },
+    client: client
+  });
   writeJson(CLICKS_FILE, clicks);
   res.json({ ok: true });
 });
 
-// Admin: view link info and clicks (for demo only; no auth)
 app.get('/api/admin', (req, res) => {
   const id = req.query.id;
   const links = readJson(LINKS_FILE);
@@ -216,28 +202,29 @@ app.get('/api/admin', (req, res) => {
   res.json({ id, link, clicks: clicks[id] || [] });
 });
 
-// Simple homepage
-// Serve static UI from public/
 app.use(express.static(path.join(__dirname, 'public')));
+
+const ROOT_DIR = path.resolve(__dirname, '..');
+app.get(['/ip-tracker', '/ip-tracker/'], (req, res) => {
+  res.sendFile(path.join(ROOT_DIR, 'index.html'));
+});
+app.use('/ip-tracker', express.static(ROOT_DIR));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Return all links (for UI listing)
 app.get('/api/links', (req, res) => {
   const links = readJson(LINKS_FILE);
   res.json(links);
 });
 
-// Delete all links and clicks (wipe history)
 app.delete('/api/links', (req, res) => {
   writeJson(LINKS_FILE, {});
   writeJson(CLICKS_FILE, {});
   res.json({ ok: true });
 });
 
-// Delete a single link and its clicks
 app.delete('/api/delete', (req, res) => {
   const id = req.query.id;
   if (!id) return res.status(400).json({ error: 'id required' });
@@ -256,7 +243,5 @@ app.delete('/api/delete', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  const base = process.env.BASE_URL ? process.env.BASE_URL.replace(/\/$/, '') : null;
-  if (base) console.log(`Link tracker running on ${base} (listening port ${PORT})`);
-  else console.log(`Link tracker running on port ${PORT}`);
+  console.log(`Link tracker running on port ${PORT}`);
 });

@@ -10,7 +10,7 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/ip-tracker/styles-link-sharing.css" />
   </head>
   <body>
     <main class="container">
@@ -22,7 +22,7 @@
             <span class="status-pill alt">RADAR ONLINE</span>
           </div>
         </div>
-        <p class="subtitle">Look up the location and network details for any IP address.</p>
+        <p class="subtitle">Look up the approximate city-level location and network details for a public IP address.</p>
 
         <div class="console">
           <canvas id="radar"></canvas>
@@ -70,16 +70,23 @@
         </div>
 
         <div class="search-box">
-          <input id="ipInput" type="text" placeholder="Enter IP address or leave blank for your own" />
+          <input id="ipInput" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Enter a public IPv4 or IPv6 address" aria-label="IP address" />
           <button id="trackBtn">Track</button>
           <button id="locateBtn" class="secondary-btn">Use my location</button>
         </div>
 
-        <div id="status" class="status">Loading your public IP…</div>
+        <div id="status" class="status" role="status" aria-live="polite">Ready to track an IP address.</div>
+
+        <p class="location-note">IP geolocation is approximate and normally identifies an ISP or network area, not a device's exact address. Private network IPs cannot be located publicly.</p>
+
+        <section class="activity-panel" aria-label="Lookup activity">
+          <div class="activity-panel-header"><span>LOOKUP ACTIVITY</span><span class="activity-label">SIMULATED STATUS</span></div>
+          <div id="activityGrid" class="activity-grid" aria-live="polite"></div>
+        </section>
 
         <div class="link-tracker-link">
           <p>Want to track clicks on a shared URL instead?</p>
-          <a href="./link-tracker/public/index.html" target="_blank" rel="noopener noreferrer">Open Link Tracker</a>
+          <a href="/" target="_blank" rel="noopener noreferrer">Open Link Tracker</a>
         </div>
 
         <div id="result" class="result hidden">
@@ -129,6 +136,6 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
-    <script src="script.js"></script>
+    <script src="/ip-tracker/script.js"></script>
   </body>
 </html>

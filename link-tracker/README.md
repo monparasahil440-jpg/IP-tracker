@@ -37,13 +37,15 @@ You will receive a short URL like `http://localhost:3000/r/abc123`.
 
 Visit `http://localhost:3000/admin/abc123` to see logged clicks.
 
-Advanced: request device permissions
+Consent-based sharing flow
 
-The server now serves an interstitial page when a tracking link is opened. That page will:
-- Log the initial request (IP, UA, referer) immediately.
-- Ask the browser for optional permissions (geolocation). If the user allows, the page will send location and battery data back to the server before redirecting to the final target.
+When a family link is opened, it shows a choice page before any visitor record is stored. The visitor can:
 
-Important: Geolocation requires user consent and usually HTTPS (localhost is allowed). The Battery API may be unavailable in some browsers.
+- Continue without sharing any visit data.
+- Voluntarily share basic visit data: public IP, browser/device information, visit time, and referrer when available.
+- Voluntarily share current location. The browser will show its normal location permission prompt; declining still allows the visitor to continue.
+
+Geolocation requires user consent and usually HTTPS (localhost is allowed). The app does not collect battery data.
 
 Legal & ethical reminder: Always obtain consent from the person whose device you are requesting device data from. Do not use this feature to track people without permission.
 

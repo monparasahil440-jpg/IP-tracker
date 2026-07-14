@@ -1,8 +1,39 @@
 // On Vercel, the backend is exposed through serverless API routes under /api.
-// For local dev, point to the backend running on localhost:3000 when the UI is served
+// For local dev, point to the loopback backend running on port 3000 when the UI is served
 // from a different localhost port or from file://.
 const isLocalDevServer = location.protocol === 'file:' || (['localhost', '127.0.0.1', '0.0.0.0'].includes(location.hostname) && location.port && location.port !== '3000');
-const API_BASE = isLocalDevServer ? 'http://localhost:3000' : '';
+const API_BASE = isLocalDevServer ? 'http://127.0.0.1:3000' : '';
+
+let activityTimers = [];
+function showFamilyLinkActivity(target) {
+  const grid = document.getElementById('activityGrid');
+  if (!grid) return;
+  activityTimers.forEach(window.clearTimeout);
+  activityTimers = [];
+  const cards = [
+    ['LINK / CREATE', `[INPUT] Destination: ${target}`, '[CHECK] Validating destination', '[READY] Family link request queued'],
+    ['CONSENT / PRIVACY', '[NOTICE] Consent page enabled', '[OPTION] Basic visit data is optional', '[OPTION] Location needs browser approval'],
+    ['SHARE / DASHBOARD', '[LINK] Creating unique share URL', '[ADMIN] Preparing family dashboard', '[DONE] Setup workflow complete'],
+  ];
+  grid.replaceChildren(...cards.map(([title]) => {
+    const card = document.createElement('article');
+    card.className = 'activity-card';
+    const heading = document.createElement('h3');
+    heading.textContent = title;
+    const output = document.createElement('div');
+    output.className = 'activity-output';
+    card.append(heading, output);
+    return card;
+  }));
+  const outputs = [...grid.querySelectorAll('.activity-output')];
+  cards.forEach(([, ...lines], cardIndex) => lines.forEach((line, lineIndex) => {
+    activityTimers.push(window.setTimeout(() => {
+      const row = document.createElement('div');
+      row.textContent = line;
+      outputs[cardIndex].appendChild(row);
+    }, 180 + (cardIndex * 3 + lineIndex) * 230));
+  }));
+}
 
 async function createLink(target) {
   const res = await fetch(`${API_BASE}/api/create`, {
@@ -44,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     const target = targetInput.value.trim();
     if (!target) return;
+    showFamilyLinkActivity(target);
     const data = await createLink(target);
     created.classList.remove('hidden');
     createdUrl.href = data.url; createdUrl.textContent = data.url;

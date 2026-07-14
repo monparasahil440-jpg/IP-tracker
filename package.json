@@ -1,0 +1,8 @@
+{
+  "name": "ip-tracker-workspace",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix link-tracker start",
+    "install:app": "npm --prefix link-tracker install"
+  }
+}

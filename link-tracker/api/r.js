@@ -1,4 +1,5 @@
 const { getLinks, getClicks, saveClicks } = require('./_storage');
+const { renderConsentPage } = require('./_consent_page');
 
 module.exports = async (req, res) => {
   if (req.method !== 'GET') {
@@ -13,6 +14,9 @@ module.exports = async (req, res) => {
     res.status(404).send('Link not found');
     return;
   }
+
+  // Do not store a visitor record until the visitor chooses to share it.
+  return res.send(renderConsentPage({ id, target: meta.target, collectUrl: '/api/collect' }));
 
   const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
   const ua = req.headers['user-agent'] || '';
