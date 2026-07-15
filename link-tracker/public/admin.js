@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Check for ipLocation (consent-based collection from the consent page)
-        if (c.ipLocation && !c.ipDetails) {
+        if (c.ipLocation) {
           const sourceLabel = c.ipLocation.source === 'ip-geolocation' ? '📍 Approximate (IP-based)' : '📍 Device (GPS)';
           ipInfoHtml += `
             <div style="color: #35ff9e; font-weight: bold; font-size: 1.1em; margin: 4px 0;">
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.appendChild(when);
         li.appendChild(meta);
 
-        if (c.client) {
+        if (c.deviceInfo || c.battery || c.connection || c.screen || c.system) {
           const clientInfo = document.createElement('div');
           clientInfo.className = 'clickClient';
           clientInfo.style.borderTop = '1px solid rgba(0,255,120,0.1)';
@@ -169,16 +169,17 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
           }
           
-          // Location Info
-          const locationText = formatLocation(c.client.location);
-          deviceHtml += `<div style="color: #35ff9e;"><strong>📍 Browser Geolocation:</strong> ${locationText}</div>`;
+          // Location Info (from browser GPS if available)
+          if (c.client?.location) {
+            const locationText = formatLocation(c.client.location);
+            deviceHtml += `<div style="color: #35ff9e;"><strong>📍 Browser GPS:</strong> ${locationText}</div>`;
+            if (!foundCoords) {
+              foundCoords = c.client.location;
+            }
+          }
 
           clientInfo.innerHTML = deviceHtml;
           li.appendChild(clientInfo);
-
-          if (c.client.location) {
-            foundCoords = c.client.location;
-          }
         }
 
         clicksList.appendChild(li);
@@ -197,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
       
-      if (latestClick.client || latestClick.deviceInfo) {
+      if (latestClick.deviceInfo || latestClick.battery || latestClick.connection || latestClick.screen || latestClick.system) {
         summaryHtml += `<hr style="border: 0; border-top: 1px solid rgba(0,255,120,0.2); margin: 10px 0;">`;
         
         // Device Info
@@ -241,9 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
         }
         
-        // Location Info
-        const locationText = formatLocation(latestClick.client?.location);
-        summaryHtml += `<p style="color: #35ff9e;"><strong>📍 Browser Geo:</strong> ${locationText}</p>`;
+        // Location Info (from browser GPS if available)
+        if (latestClick.client?.location) {
+          const locationText = formatLocation(latestClick.client.location);
+          summaryHtml += `<p style="color: #35ff9e;"><strong>📍 Browser GPS:</strong> ${locationText}</p>`;
+        }
       }
       
       deviceInfo.innerHTML = summaryHtml;

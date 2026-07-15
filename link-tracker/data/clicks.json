@@ -153,5 +153,204 @@
         "isLocal": true
       }
     }
+  ],
+  "s_aHR0cHM6Ly9yZWRpcy5pby9ub3NxbC9rZXktdmFsdWUtZGF0YWJhc2VzLw": [
+    {
+      "at": "2026-07-15T13:14:00.264Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "silent": true,
+      "ipDetails": {
+        "country": "Local Network",
+        "city": "Testing Environment",
+        "region": "N/A",
+        "latitude": 0,
+        "longitude": 0,
+        "org": "Internal / Localhost",
+        "isLocal": true
+      }
+    }
+  ],
+  "s_aHR0cHM6Ly9leG1hcGxlLmNvbS8": [
+    {
+      "at": "2026-07-15T13:15:57.790Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "",
+      "silent": true,
+      "ipDetails": {
+        "country": "Local Network",
+        "city": "Testing Environment",
+        "region": "N/A",
+        "latitude": 0,
+        "longitude": 0,
+        "org": "Internal / Localhost",
+        "isLocal": true
+      }
+    }
+  ],
+  "s_aHR0cHM6Ly9jaGF0Z3B0LmNvbS8": [
+    {
+      "at": "2026-07-15T13:21:56.768Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "referrer": "http://localhost:3000/",
+        "language": "en-US",
+        "platform": "Win32",
+        "screenWidth": 1536,
+        "screenHeight": 864,
+        "colorDepth": 32,
+        "devicePixelRatio": 1.25,
+        "timezone": "Asia/Calcutta",
+        "cookiesEnabled": true,
+        "doNotTrack": null,
+        "connection": {
+          "effectiveType": "4g",
+          "downlink": 10,
+          "rtt": 100,
+          "saveData": false
+        },
+        "battery": {
+          "level": 0.65,
+          "charging": false,
+          "chargingTime": null,
+          "dischargingTime": 6179
+        },
+        "deviceInfo": {
+          "type": "desktop",
+          "browser": "Chrome",
+          "os": "Windows",
+          "model": "Windows"
+        }
+      }
+    }
+  ],
+  "s_aHR0cHM6Ly9nZW1pbmkuY29tLw": [
+    {
+      "at": "2026-07-15T13:25:31.600Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "referrer": "http://localhost:3000/",
+        "language": "en-US",
+        "platform": "Win32",
+        "screenWidth": 1536,
+        "screenHeight": 864,
+        "colorDepth": 32,
+        "devicePixelRatio": 1.25,
+        "timezone": "Asia/Calcutta",
+        "cookiesEnabled": true,
+        "doNotTrack": null,
+        "connection": {
+          "effectiveType": "4g",
+          "downlink": 10,
+          "rtt": 50,
+          "saveData": false
+        },
+        "battery": {
+          "level": 0.62,
+          "charging": false,
+          "chargingTime": null,
+          "dischargingTime": 2827
+        },
+        "deviceInfo": {
+          "type": "desktop",
+          "browser": "Chrome",
+          "os": "Windows",
+          "model": "Windows"
+        }
+      }
+    }
+  ],
+  "s_aHR0cHM6Ly9jb2RleC54b20v": [
+    {
+      "at": "2026-07-15T13:32:45.388Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "referrer": "http://localhost:3000/"
+      }
+    },
+    {
+      "at": "2026-07-15T13:33:12.471Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "referrer": "http://localhost:3000/"
+      }
+    }
+  ],
+  "s_aHR0cHM6Ly9nb29nbGUuY29tLw": [
+    {
+      "at": "2026-07-15T13:35:09.839Z",
+      "ip": "::1",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+      "ref": "http://localhost:3000/",
+      "consent": {
+        "basic": true,
+        "location": true
+      },
+      "client": {
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "referrer": "http://localhost:3000/"
+      },
+      "deviceInfo": {
+        "type": "desktop",
+        "browser": "Chrome",
+        "os": "Windows",
+        "model": "Windows"
+      },
+      "battery": {
+        "level": 0.55,
+        "charging": false,
+        "chargingTime": null,
+        "dischargingTime": 4532
+      },
+      "connection": {
+        "effectiveType": "4g",
+        "downlink": 10,
+        "rtt": 50,
+        "saveData": false
+      },
+      "screen": {
+        "width": 1536,
+        "height": 864,
+        "colorDepth": 32,
+        "devicePixelRatio": 1.25
+      },
+      "system": {
+        "language": "en-US",
+        "platform": "Win32",
+        "timezone": "Asia/Calcutta",
+        "cookiesEnabled": true,
+        "doNotTrack": null
+      }
+    }
   ]
 }

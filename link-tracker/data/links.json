@@ -68,5 +68,45 @@
     "target": "https://sahil-monpara-portfolio.webflow.io/",
     "note": null,
     "createdAt": "2026-07-15T12:55:19.064Z"
+  },
+  "s_aHR0cHM6Ly9yZWRpcy5pby9ub3NxbC9rZXktdmFsdWUtZGF0YWJhc2VzLw": {
+    "target": "https://redis.io/nosql/key-value-databases/",
+    "note": null,
+    "createdAt": "2026-07-15T13:13:57.661Z"
+  },
+  "s_aHR0cHM6Ly9leG1hcGxlLmNvbS8": {
+    "target": "https://exmaple.com/",
+    "note": null,
+    "createdAt": "2026-07-15T13:15:49.380Z"
+  },
+  "s_aHR0cHM6Ly9mb3ItY2hlY2suY29tLw": {
+    "target": "https://for-check.com/",
+    "note": null,
+    "createdAt": "2026-07-15T13:19:23.447Z"
+  },
+  "s_aHR0cHM6Ly9jaGF0Z3B0LmNvbS8": {
+    "target": "https://chatgpt.com/",
+    "note": null,
+    "createdAt": "2026-07-15T13:36:06.619Z"
+  },
+  "s_aHR0cHM6Ly9nZW1pbmkuY29tLw": {
+    "target": "https://gemini.com/",
+    "note": null,
+    "createdAt": "2026-07-15T13:24:18.139Z"
+  },
+  "s_aHR0cHM6Ly9jb2RleC54b20v": {
+    "target": "https://codex.xom/",
+    "note": null,
+    "createdAt": "2026-07-15T13:27:44.228Z"
+  },
+  "s_aHR0cHM6Ly9nb29nbGUuY29tLw": {
+    "target": "https://google.com/",
+    "note": null,
+    "createdAt": "2026-07-15T13:58:12.241Z"
+  },
+  "s_aHR0cHM6Ly93ZWJmbG93LmNvbS8": {
+    "target": "https://webflow.com/",
+    "note": null,
+    "createdAt": "2026-07-15T13:38:16.083Z"
   }
 }

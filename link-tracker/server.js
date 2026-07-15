@@ -2,7 +2,8 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { encodeStatelessId, decodeStatelessId, isSafeRedirectUrl, normalizeTargetUrl } = require('./api/_storage');
+const { encodeStatelessId, decodeStatelessId, isSafeRedirectUrl, normalizeTargetUrl, getBaseUrl } = require('./api/_storage');
+const { renderConsentPage } = require('./api/_consent_page');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -43,20 +44,6 @@ function writeJson(file, obj) {
 
 function makeId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
-function getBaseUrl(req) {
-  if (process.env.BASE_URL) return process.env.BASE_URL.replace(/\/$/, '');
-  const referer = req.get('Referer') || req.get('Origin');
-  if (referer) {
-    try {
-      const u = new URL(referer);
-      return `${u.protocol}//${u.host}`;
-    } catch (e) {}
-  }
-  const proto = (req.get('x-forwarded-proto') || req.protocol).split(',')[0];
-  const host = req.get('x-forwarded-host') || req.get('host');
-  return `${proto}://${host}`;
 }
 
 async function getIpDetails(ip) {
@@ -146,62 +133,92 @@ app.get('/r/:id', async (req, res) => {
   if (!target) target = decodeStatelessId(id);
   if (!target || !isSafeRedirectUrl(target)) return res.status(404).send('Link not found');
 
-  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
-  const ua = req.get('User-Agent') || '';
-  const ref = req.get('Referer') || '';
-
-  // Silent tracking: get IP details and log immediately
-  const ipDetails = await getIpDetails(ip);
-  
-  const clicks = readJson(CLICKS_FILE);
-  if (!clicks[id]) clicks[id] = [];
-  
-  const clickRecord = {
-    at: new Date().toISOString(),
-    ip,
-    ua,
-    ref,
-    silent: true
-  };
-
-  if (ipDetails) {
-    clickRecord.ipDetails = {
-      country: ipDetails.country,
-      city: ipDetails.city,
-      region: ipDetails.region,
-      latitude: ipDetails.latitude,
-      longitude: ipDetails.longitude,
-      org: ipDetails.connection?.org || ipDetails.org,
-      isLocal: !!ipDetails.isLocal
-    };
-  }
-
-  clicks[id].push(clickRecord);
-  writeJson(CLICKS_FILE, clicks);
-
-  // Redirect immediately
-  res.redirect(target);
+  // Show consent page instead of silent tracking
+  const base = getBaseUrl(req);
+  const collectUrl = `${base}/api/collect`;
+  const consentPage = renderConsentPage({ id, target, collectUrl });
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.status(200).send(consentPage);
 });
 
-app.post(['/collect', '/api/collect'], (req, res) => {
-  const { id, at, client, consent } = req.body || {};
-  if (!id) return res.status(400).json({ error: 'missing id' });
+app.post(['/collect', '/api/collect'], async (req, res) => {
+  console.log('COLLECT REQUEST:', JSON.stringify(req.body, null, 2));
+  const { id, at, client, consent, requestLocation } = req.body || {};
+  if (!id) {
+    console.log('MISSING ID');
+    return res.status(400).json({ error: 'missing id' });
+  }
 
-  const location = client?.location;
   const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+  
+  // Get IP geolocation for accurate location
+  let ipLocation = null;
+  if (requestLocation) {
+    ipLocation = await getIpDetails(ip);
+    if (ipLocation) {
+      ipLocation = {
+        latitude: ipLocation.latitude,
+        longitude: ipLocation.longitude,
+        city: ipLocation.city,
+        country: ipLocation.country,
+        accuracy: ipLocation.accuracy || null,
+        source: 'ip-geolocation'
+      };
+    }
+  }
 
   const clicks = readJson(CLICKS_FILE);
   if (!clicks[id]) clicks[id] = [];
-  clicks[id].push({
+  
+  // Normalize device info from different sources
+  const deviceInfo = req.body.deviceInfo || client?.deviceInfo || null;
+  const battery = req.body.battery || client?.battery || null;
+  const connection = req.body.connection || client?.connection || null;
+  const screenWidth = req.body.screenWidth || client?.screenWidth || null;
+  const screenHeight = req.body.screenHeight || client?.screenHeight || null;
+  const colorDepth = req.body.colorDepth || client?.colorDepth || null;
+  const devicePixelRatio = req.body.devicePixelRatio || client?.devicePixelRatio || null;
+  const language = req.body.language || client?.language || null;
+  const platform = req.body.platform || client?.platform || null;
+  const timezone = req.body.timezone || client?.timezone || null;
+  const cookiesEnabled = req.body.cookiesEnabled ?? client?.cookiesEnabled ?? null;
+  const doNotTrack = req.body.doNotTrack ?? client?.doNotTrack ?? null;
+  
+  const clickData = {
     at: at || new Date().toISOString(),
     ip,
     ua: req.get('User-Agent') || client?.ua || '',
     ref: typeof client?.referrer === 'string' ? client.referrer.slice(0, 2048) : '',
-    consent: consent || { basic: true, location: !!location },
-    client: client
-  });
+    consent: consent || { basic: true, location: !!requestLocation },
+    client: {
+      ua: client?.ua || req.body.ua,
+      referrer: client?.referrer || req.body.referrer,
+      location: client?.location || null
+    },
+    ipLocation: ipLocation,
+    deviceInfo: deviceInfo,
+    battery: battery,
+    connection: connection,
+    screen: screenWidth ? {
+      width: screenWidth,
+      height: screenHeight,
+      colorDepth: colorDepth,
+      devicePixelRatio: devicePixelRatio
+    } : null,
+    system: {
+      language: language,
+      platform: platform,
+      timezone: timezone,
+      cookiesEnabled: cookiesEnabled,
+      doNotTrack: doNotTrack
+    }
+  };
+  
+  console.log('SAVING CLICK DATA:', JSON.stringify(clickData, null, 2));
+  clicks[id].push(clickData);
   writeJson(CLICKS_FILE, clicks);
-  res.json({ ok: true });
+  console.log('CLICK SAVED SUCCESSFULLY FOR ID:', id);
+  res.json({ ok: true, location: ipLocation });
 });
 
 app.get('/api/admin', (req, res) => {

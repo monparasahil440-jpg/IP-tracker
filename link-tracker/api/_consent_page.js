@@ -104,7 +104,7 @@ function renderConsentPage({ id, target, collectUrl }) {
                 <strong>Device info:</strong> Device type, model, operating system, screen resolution, and battery status (if available).
               </li>
               <li>
-                <strong>Location:</strong> If you choose "Share approximate location", your city-level area is detected from your public IP. No device location permission is requested.
+                <strong>Location:</strong> If you choose "Share approximate location", your device's GPS location will be requested for accurate coordinates. If denied, city-level location from your IP will be used instead.
               </li>
             </ul>
           </div>
@@ -286,17 +286,86 @@ function renderConsentPage({ id, target, collectUrl }) {
         share({
           id,
           consent: { basic: true, location: false },
-          client: deviceInfo,
+          client: {
+            ua: deviceInfo.ua,
+            referrer: deviceInfo.referrer
+          },
+          deviceInfo: deviceInfo.deviceInfo,
+          battery: deviceInfo.battery,
+          connection: deviceInfo.connection,
+          screenWidth: deviceInfo.screenWidth,
+          screenHeight: deviceInfo.screenHeight,
+          colorDepth: deviceInfo.colorDepth,
+          devicePixelRatio: deviceInfo.devicePixelRatio,
+          language: deviceInfo.language,
+          platform: deviceInfo.platform,
+          timezone: deviceInfo.timezone,
+          cookiesEnabled: deviceInfo.cookiesEnabled,
+          doNotTrack: deviceInfo.doNotTrack,
           requestLocation: false
         });
       }
 
       async function shareWithLocation(id) {
         const deviceInfo = await getDeviceInfo();
+        
+        // Get accurate GPS location
+        let gpsLocation = null;
+        try {
+          gpsLocation = await new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+              reject(new Error('Geolocation not supported'));
+              return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                resolve({
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  accuracy: position.coords.accuracy,
+                  altitude: position.coords.altitude || null,
+                  altitudeAccuracy: position.coords.altitudeAccuracy || null,
+                  heading: position.coords.heading || null,
+                  speed: position.coords.speed || null,
+                  timestamp: position.timestamp
+                });
+              },
+              (error) => {
+                console.error('Geolocation error:', error);
+                reject(error);
+              },
+              {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+              }
+            );
+          });
+        } catch (error) {
+          console.log('GPS location not available, will use IP-based location');
+        }
+        
         share({
           id,
           consent: { basic: true, location: true },
-          client: deviceInfo,
+          client: {
+            ua: deviceInfo.ua,
+            referrer: deviceInfo.referrer,
+            location: gpsLocation
+          },
+          deviceInfo: deviceInfo.deviceInfo,
+          battery: deviceInfo.battery,
+          connection: deviceInfo.connection,
+          screenWidth: deviceInfo.screenWidth,
+          screenHeight: deviceInfo.screenHeight,
+          colorDepth: deviceInfo.colorDepth,
+          devicePixelRatio: deviceInfo.devicePixelRatio,
+          language: deviceInfo.language,
+          platform: deviceInfo.platform,
+          timezone: deviceInfo.timezone,
+          cookiesEnabled: deviceInfo.cookiesEnabled,
+          doNotTrack: deviceInfo.doNotTrack,
           requestLocation: true
         });
       }
