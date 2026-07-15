@@ -34,9 +34,28 @@ function writeJson(file, obj) {
 }
 
 // Stateless Link Helpers: Encode/Decode target URL into the ID
+function normalizeTargetUrl(target) {
+  const trimmed = String(target).trim();
+  if (!trimmed) throw new Error('target URL required');
+  const url = new URL(/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`);
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new Error('target must be an http or https URL');
+  }
+  return url.href;
+}
+
+function isSafeRedirectUrl(target) {
+  try {
+    const url = new URL(target);
+    return ['http:', 'https:'].includes(url.protocol);
+  } catch (e) {
+    return false;
+  }
+}
+
 function encodeStatelessId(targetUrl) {
-  // We use a prefix 's_' to identify stateless links
-  const b64 = Buffer.from(targetUrl).toString('base64url');
+  const normalized = normalizeTargetUrl(targetUrl);
+  const b64 = Buffer.from(normalized).toString('base64url');
   return `s_${b64}`;
 }
 
@@ -44,7 +63,8 @@ function decodeStatelessId(id) {
   if (id && id.startsWith('s_')) {
     try {
       const b64 = id.substring(2);
-      return Buffer.from(b64, 'base64url').toString('utf8');
+      const target = Buffer.from(b64, 'base64url').toString('utf8');
+      return isSafeRedirectUrl(target) ? target : null;
     } catch (e) { return null; }
   }
   return null;
@@ -96,6 +116,8 @@ module.exports = {
   saveClicks,
   makeId,
   getBaseUrl,
+  normalizeTargetUrl,
+  isSafeRedirectUrl,
   encodeStatelessId,
   decodeStatelessId
 };

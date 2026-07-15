@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { encodeStatelessId, decodeStatelessId, isSafeRedirectUrl, normalizeTargetUrl } = require('./api/_storage');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -92,10 +93,15 @@ async function getIpDetails(ip) {
 }
 
 app.post('/api/create', (req, res) => {
-  const { target, note } = req.body;
-  if (!target) return res.status(400).json({ error: 'target URL required' });
+  let target;
+  try {
+    target = normalizeTargetUrl(req.body?.target);
+  } catch (error) {
+    return res.status(400).json({ error: error.message || 'target URL required' });
+  }
+  const { note } = req.body;
 
-  const id = makeId();
+  const id = encodeStatelessId(target);
   const links = readJson(LINKS_FILE);
   links[id] = { target, note: note || null, createdAt: new Date().toISOString() };
   writeJson(LINKS_FILE, links);
@@ -120,9 +126,13 @@ app.post('/api/create', (req, res) => {
 });
 
 app.get('/api/create', (req, res) => {
-  const target = req.query.target;
-  if (!target) return res.status(400).send('Please provide ?target=https://example.com');
-  const id = makeId();
+  let target;
+  try {
+    target = normalizeTargetUrl(req.query.target);
+  } catch (error) {
+    return res.status(400).send(error.message || 'Please provide ?target=https://example.com');
+  }
+  const id = encodeStatelessId(target);
   const links = readJson(LINKS_FILE);
   links[id] = { target, note: null, createdAt: new Date().toISOString() };
   writeJson(LINKS_FILE, links);
@@ -132,8 +142,9 @@ app.get('/api/create', (req, res) => {
 app.get('/r/:id', async (req, res) => {
   const id = req.params.id;
   const links = readJson(LINKS_FILE);
-  const meta = links[id];
-  if (!meta) return res.status(404).send('Link not found');
+  let target = links[id]?.target;
+  if (!target) target = decodeStatelessId(id);
+  if (!target || !isSafeRedirectUrl(target)) return res.status(404).send('Link not found');
 
   const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
   const ua = req.get('User-Agent') || '';
@@ -169,7 +180,7 @@ app.get('/r/:id', async (req, res) => {
   writeJson(CLICKS_FILE, clicks);
 
   // Redirect immediately
-  res.redirect(meta.target);
+  res.redirect(target);
 });
 
 app.post(['/collect', '/api/collect'], (req, res) => {
@@ -195,8 +206,13 @@ app.post(['/collect', '/api/collect'], (req, res) => {
 
 app.get('/api/admin', (req, res) => {
   const id = req.query.id;
+  if (!id) return res.status(400).json({ error: 'id required' });
   const links = readJson(LINKS_FILE);
-  const link = links[id];
+  let link = links[id];
+  if (!link) {
+    const target = decodeStatelessId(id);
+    if (target) link = { target, createdAt: 'Recovered from Link', isRecovered: true };
+  }
   if (!link) return res.status(404).json({ error: 'not found' });
   const clicks = readJson(CLICKS_FILE);
   res.json({ id, link, clicks: clicks[id] || [] });

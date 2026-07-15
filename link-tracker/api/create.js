@@ -1,4 +1,4 @@
-const { getLinks, saveLinks, getBaseUrl, encodeStatelessId } = require('./_storage');
+const { getLinks, saveLinks, getBaseUrl, encodeStatelessId, normalizeTargetUrl } = require('./_storage');
 
 module.exports = async (req, res) => {
   try {
@@ -7,13 +7,15 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const target = req.body?.target;
-    if (!target) {
-      res.status(400).json({ error: 'target URL required' });
+    let target;
+    try {
+      target = normalizeTargetUrl(req.body?.target);
+    } catch (error) {
+      res.status(400).json({ error: error.message || 'target URL required' });
       return;
     }
 
-    // On Vercel, we use stateless IDs so the link never breaks
+    // Stateless ID embeds the destination so redirects work on Vercel serverless
     const id = encodeStatelessId(target);
     
     // We still try to save it for the session dashboard, but the link itself 

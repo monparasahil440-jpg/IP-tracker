@@ -1,5 +1,5 @@
 const https = require('https');
-const { getLinks, getClicks, saveClicks, decodeStatelessId } = require('./_storage');
+const { getLinks, getClicks, saveClicks, decodeStatelessId, isSafeRedirectUrl } = require('./_storage');
 
 async function getIpDetails(ip) {
   return new Promise((resolve) => {
@@ -34,11 +34,11 @@ module.exports = async (req, res) => {
       target = decodeStatelessId(id);
     }
 
-    if (!target) {
+    if (!target || !isSafeRedirectUrl(target)) {
       return res.status(404).send('Link not found and cannot be recovered.');
     }
 
-    // 3. Tracking logic (Best effort - might not persist on Vercel without DB)
+    // 3. Tracking logic (best effort; click history may not persist on Vercel without a DB)
     const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
     const ua = req.headers['user-agent'] || '';
     const ipDetails = await getIpDetails(ip);

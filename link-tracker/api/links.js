@@ -9,7 +9,6 @@ module.exports = (req, res) => {
       res.status(405).send('Method Not Allowed');
     }
   } catch (error) {
-    console.error('API Links Error:', error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
