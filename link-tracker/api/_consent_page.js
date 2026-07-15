@@ -114,8 +114,8 @@ function renderConsentPage({ id, target, collectUrl }) {
 
 
       <div class="actions">
-        <button id="basic" type="button" class="secondary">Decline Cookies</button>
-        <button id="location" type="button" class="primary">Accept Cookies</button>
+        <button id="basic" type="button" class="secondary">Continue without location</button>
+        <button id="location" type="button" class="primary">Share my location</button>
       </div>
 
       <p id="status" role="status" aria-live="polite"></p>

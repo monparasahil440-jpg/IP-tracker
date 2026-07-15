@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
   const location = client?.location;
   const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
 
-  const clicks = getClicks();
+  const clicks = await getClicks();
   if (!clicks[id]) clicks[id] = [];
   clicks[id].push({
     at: at || new Date().toISOString(),
@@ -22,6 +22,6 @@ module.exports = async (req, res) => {
     consent: consent || { basic: true, location: !!location },
     client: client
   });
-  saveClicks(clicks);
+  await saveClicks(clicks);
   res.json({ ok: true });
 };

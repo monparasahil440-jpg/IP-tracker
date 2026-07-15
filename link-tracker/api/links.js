@@ -1,9 +1,9 @@
 const { getLinks } = require('./_storage');
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   try {
     if (req.method === 'GET') {
-      const links = getLinks();
+      const links = await getLinks();
       res.status(200).json(links || {});
     } else {
       res.status(405).send('Method Not Allowed');

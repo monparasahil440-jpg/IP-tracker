@@ -20,9 +20,9 @@ module.exports = async (req, res) => {
     
     // We still try to save it for the session dashboard, but the link itself 
     // will work even if this file is deleted later.
-    const links = getLinks();
+    const links = await getLinks();
     links[id] = { target, note: req.body?.note || null, createdAt: new Date().toISOString() };
-    saveLinks(links);
+    await saveLinks(links);
 
     let base = null;
     try {

@@ -6,16 +6,16 @@ module.exports = async (req, res) => {
     if (req.method !== 'DELETE') return res.status(405).json({ error: 'Method Not Allowed' });
     if (!id) return res.status(400).json({ error: 'id required' });
 
-    const links = getLinks();
+    const links = await getLinks();
     if (links[id]) {
       delete links[id];
-      saveLinks(links);
+      await saveLinks(links);
     }
 
-    const clicks = getClicks();
+    const clicks = await getClicks();
     if (clicks[id]) {
       delete clicks[id];
-      saveClicks(clicks);
+      await saveClicks(clicks);
     }
 
     return res.json({ ok: true });

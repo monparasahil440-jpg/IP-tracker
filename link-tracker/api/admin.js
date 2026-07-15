@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: 'id required' });
 
-    const links = getLinks();
+    const links = await getLinks();
     let link = links[id];
 
     // If not in storage, recover metadata from ID
@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
 
     if (!link) return res.status(404).json({ error: 'not found' });
 
-    const clicks = getClicks();
+    const clicks = await getClicks();
     res.json({ id, link, clicks: clicks[id] || [] });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
