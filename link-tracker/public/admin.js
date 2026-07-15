@@ -120,13 +120,60 @@ document.addEventListener('DOMContentLoaded', () => {
           clientInfo.style.marginTop = '10px';
           clientInfo.style.paddingTop = '10px';
           
-          const batteryText = c.client.battery ? `${Math.round((c.client.battery.level || 0) * 100)}% ${c.client.battery.charging ? '(charging)' : '(not charging)'}` : 'Not available';
+          let deviceHtml = '';
+          
+          // Device Info
+          if (c.deviceInfo) {
+            deviceHtml += `
+              <div style="margin-bottom: 8px;">
+                <strong>📱 Device:</strong> ${c.deviceInfo.type || 'Unknown'} | 
+                <strong>Model:</strong> ${c.deviceInfo.model || 'Unknown'} | 
+                <strong>OS:</strong> ${c.deviceInfo.os || 'Unknown'} | 
+                <strong>Browser:</strong> ${c.deviceInfo.browser || 'Unknown'}
+              </div>
+            `;
+          }
+          
+          // Battery Info
+          const batteryText = c.battery ? `${Math.round((c.battery.level || 0) * 100)}% ${c.battery.charging ? '⚡ (charging)' : '🔋 (not charging)'}` : 'Not available';
+          deviceHtml += `<div><strong>🔋 Battery:</strong> ${batteryText}</div>`;
+          
+          // Connection Info
+          if (c.connection) {
+            deviceHtml += `
+              <div><strong>📶 Network:</strong> ${c.connection.effectiveType || 'Unknown'} | 
+              Downlink: ${c.connection.downlink || '?'} Mbps | 
+              RTT: ${c.connection.rtt || '?'}ms | 
+              Save Data: ${c.connection.saveData ? 'Yes' : 'No'}</div>
+            `;
+          }
+          
+          // Screen Info
+          if (c.screen) {
+            deviceHtml += `
+              <div><strong>🖥️ Screen:</strong> ${c.screen.width}x${c.screen.height} | 
+              Color Depth: ${c.screen.colorDepth}bit | 
+              DPR: ${c.screen.devicePixelRatio || 'Unknown'}</div>
+            `;
+          }
+          
+          // System Info
+          if (c.system) {
+            deviceHtml += `
+              <div><strong>⚙️ System:</strong> 
+              Language: ${c.system.language || 'Unknown'} | 
+              Platform: ${c.system.platform || 'Unknown'} | 
+              Timezone: ${c.system.timezone || 'Unknown'} | 
+              Cookies: ${c.system.cookiesEnabled ? 'Enabled' : 'Disabled'} | 
+              DNT: ${c.system.doNotTrack || 'Not set'}</div>
+            `;
+          }
+          
+          // Location Info
           const locationText = formatLocation(c.client.location);
+          deviceHtml += `<div style="color: #35ff9e;"><strong>📍 Browser Geolocation:</strong> ${locationText}</div>`;
 
-          clientInfo.innerHTML = `
-            <div><strong>Battery:</strong> ${batteryText}</div>
-            <div style="color: #35ff9e;"><strong>Browser Geolocation:</strong> ${locationText}</div>
-          `;
+          clientInfo.innerHTML = deviceHtml;
           li.appendChild(clientInfo);
 
           if (c.client.location) {
@@ -150,14 +197,53 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
       
-      if (latestClick.client) {
-        const batteryText = latestClick.client.battery ? `${Math.round((latestClick.client.battery.level || 0) * 100)}% ${latestClick.client.battery.charging ? '(charging)' : '(not charging)'}` : 'Not available';
-        const locationText = formatLocation(latestClick.client.location);
-        summaryHtml += `
-          <hr style="border: 0; border-top: 1px solid rgba(0,255,120,0.2); margin: 10px 0;">
-          <p><strong>Battery:</strong> ${batteryText}</p>
-          <p><strong>Browser Geo:</strong> ${locationText}</p>
-        `;
+      if (latestClick.client || latestClick.deviceInfo) {
+        summaryHtml += `<hr style="border: 0; border-top: 1px solid rgba(0,255,120,0.2); margin: 10px 0;">`;
+        
+        // Device Info
+        if (latestClick.deviceInfo) {
+          summaryHtml += `
+            <p><strong>📱 Device:</strong> ${latestClick.deviceInfo.type || 'Unknown'} | 
+            <strong>Model:</strong> ${latestClick.deviceInfo.model || 'Unknown'} | 
+            <strong>OS:</strong> ${latestClick.deviceInfo.os || 'Unknown'} | 
+            <strong>Browser:</strong> ${latestClick.deviceInfo.browser || 'Unknown'}</p>
+          `;
+        }
+        
+        // Battery Info
+        const batteryText = latestClick.battery ? `${Math.round((latestClick.battery.level || 0) * 100)}% ${latestClick.battery.charging ? '⚡ (charging)' : '🔋 (not charging)'}` : 'Not available';
+        summaryHtml += `<p><strong>🔋 Battery:</strong> ${batteryText}</p>`;
+        
+        // Connection Info
+        if (latestClick.connection) {
+          summaryHtml += `
+            <p><strong>📶 Network:</strong> ${latestClick.connection.effectiveType || 'Unknown'} | 
+            Downlink: ${latestClick.connection.downlink || '?'} Mbps | 
+            RTT: ${latestClick.connection.rtt || '?'}ms</p>
+          `;
+        }
+        
+        // Screen Info
+        if (latestClick.screen) {
+          summaryHtml += `
+            <p><strong>🖥️ Screen:</strong> ${latestClick.screen.width}x${latestClick.screen.height} | 
+            DPR: ${latestClick.screen.devicePixelRatio || 'Unknown'}</p>
+          `;
+        }
+        
+        // System Info
+        if (latestClick.system) {
+          summaryHtml += `
+            <p><strong>⚙️ System:</strong> 
+            Language: ${latestClick.system.language || 'Unknown'} | 
+            Platform: ${latestClick.system.platform || 'Unknown'} | 
+            Timezone: ${latestClick.system.timezone || 'Unknown'}</p>
+          `;
+        }
+        
+        // Location Info
+        const locationText = formatLocation(latestClick.client?.location);
+        summaryHtml += `<p style="color: #35ff9e;"><strong>📍 Browser Geo:</strong> ${locationText}</p>`;
       }
       
       deviceInfo.innerHTML = summaryHtml;

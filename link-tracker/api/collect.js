@@ -64,7 +64,23 @@ module.exports = async (req, res) => {
     ref: typeof client?.referrer === 'string' ? client.referrer.slice(0, 2048) : '',
     consent: consent || { basic: true, location: !!location },
     client: client,
-    ipLocation: location
+    ipLocation: location,
+    deviceInfo: client?.deviceInfo || null,
+    battery: client?.battery || null,
+    connection: client?.connection || null,
+    screen: client?.screenWidth ? {
+      width: client.screenWidth,
+      height: client.screenHeight,
+      colorDepth: client.colorDepth,
+      devicePixelRatio: client.devicePixelRatio
+    } : null,
+    system: {
+      language: client?.language || null,
+      platform: client?.platform || null,
+      timezone: client?.timezone || null,
+      cookiesEnabled: client?.cookiesEnabled || null,
+      doNotTrack: client?.doNotTrack || null
+    }
   });
   await saveClicks(clicks);
   res.json({ ok: true, location });
