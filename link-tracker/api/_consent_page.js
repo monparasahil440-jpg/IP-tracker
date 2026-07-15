@@ -89,33 +89,27 @@ function renderConsentPage({ id, target, collectUrl }) {
   </head>
   <body>
     <main>
-      <h1>Cookie Preferences</h1>
+      <h1>Choose what to share</h1>
         <p>
-          We use cookies to improve your browsing experience, analyze website traffic, and remember your preferences. You can choose which types of cookies you want to allow before continuing.
+          Before continuing to the destination, you can choose what information to share. Your choice is anonymous and used only for analytics.
         </p>
 
           <div class="notice">
-            <strong>Cookie categories</strong>
+            <strong>What gets shared?</strong>
             <ul>
               <li>
-                <strong>Essential Cookies:</strong> Required for the website to function properly. These cookies cannot be disabled.
+                <strong>Basic info:</strong> Public IP address (city-level), browser type and version, and the time of visit.
               </li>
               <li>
-                <strong>Analytics Cookies:</strong> Help us understand how visitors use the website by collecting anonymous usage information.
-              </li>
-              <li>
-                <strong>Functional Cookies:</strong> Remember your preferences, such as language or region, to provide a more personalized experience.
-              </li>
-              <li>
-                <strong>Marketing Cookies:</strong> Used to deliver relevant content or advertisements and measure the effectiveness of marketing campaigns.
+                <strong>Location:</strong> If you choose "Share approximate location", your city-level area is detected from your public IP. No device location permission is requested.
               </li>
             </ul>
           </div>
 
 
       <div class="actions">
-        <button id="basic" type="button" class="secondary">Continue without location</button>
-        <button id="location" type="button" class="primary">Share my location</button>
+        <button id="basic" type="button" class="secondary">Continue without sharing</button>
+        <button id="location" type="button" class="primary">Share approximate location</button>
       </div>
 
       <p id="status" role="status" aria-live="polite"></p>
@@ -174,50 +168,17 @@ function renderConsentPage({ id, target, collectUrl }) {
           id,
           consent: { basic: true, location: false },
           client: clientInfo(),
+          requestLocation: false
         });
       }
 
       function shareWithLocation(id) {
-        if (!navigator.geolocation) {
-          share({
-            id,
-            consent: { basic: true, location: false },
-            client: clientInfo(),
-          });
-          return;
-        }
-
-        setBusy('Waiting for your location choice…');
-
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            share({
-              id,
-              consent: { basic: true, location: true },
-              client: {
-                ...clientInfo(),
-                location: {
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                  accuracy: position.coords.accuracy,
-                },
-              },
-            });
-          },
-          () => {
-            // User denied or location unavailable
-            share({
-              id,
-              consent: { basic: true, location: false },
-              client: clientInfo(),
-            });
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-          }
-        );
+        share({
+          id,
+          consent: { basic: true, location: true },
+          client: clientInfo(),
+          requestLocation: true
+        });
       }
 
       // Basic button
@@ -228,7 +189,7 @@ function renderConsentPage({ id, target, collectUrl }) {
 
       // Location button
       document.getElementById('location').addEventListener('click', () => {
-        setBusy('Sharing visit information…');
+        setBusy('Detecting approximate location from IP…');
         shareWithLocation(id);
       });
     

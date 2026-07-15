@@ -70,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         meta.className = 'clickMeta';
         
         let ipInfoHtml = `<div><strong>IP:</strong> ${c.ip || 'Unknown'}</div>`;
+
+        // Check for ipDetails (silent tracking from server-side /r/ routes)
         if (c.ipDetails) {
           const locColor = c.ipDetails.isLocal ? '#ffcc00' : '#35ff9e';
           ipInfoHtml += `
@@ -83,6 +85,22 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
           if (!foundCoords || !c.ipDetails.isLocal) {
             foundCoords = { latitude: c.ipDetails.latitude, longitude: c.ipDetails.longitude };
+          }
+        }
+
+        // Check for ipLocation (consent-based collection from the consent page)
+        if (c.ipLocation && !c.ipDetails) {
+          const sourceLabel = c.ipLocation.source === 'ip-geolocation' ? '📍 Approximate (IP-based)' : '📍 Device (GPS)';
+          ipInfoHtml += `
+            <div style="color: #35ff9e; font-weight: bold; font-size: 1.1em; margin: 4px 0;">
+              ${sourceLabel}: ${c.ipLocation.city || '?'}, ${c.ipLocation.country || '?'}
+            </div>
+            <div style="font-family: monospace; background: rgba(0,255,120,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px;">
+              LAT: ${c.ipLocation.latitude} | LON: ${c.ipLocation.longitude}
+            </div>
+          `;
+          if (!foundCoords) {
+            foundCoords = { latitude: c.ipLocation.latitude, longitude: c.ipLocation.longitude };
           }
         }
 
