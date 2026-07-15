@@ -1,5 +1,24 @@
 {
   "rewrites": [
-    { "source": "/r/(.*)", "destination": "/api/r?id=$1" }
+    { "source": "/r/:id", "destination": "/api/r" },
+    { "source": "/ip-tracker", "destination": "/api/ip-tracker" },
+    { "source": "/ip-tracker/:path*", "destination": "/api/ip-tracker" },
+    { "source": "/styles.css", "destination": "/api/index" },
+    { "source": "/main.js", "destination": "/api/index" },
+    { "source": "/admin.js", "destination": "/api/index" },
+    { "source": "/admin.html", "destination": "/api/index" },
+    { "source": "/styles-link-sharing.css", "destination": "/api/ip-tracker" },
+    { "source": "/script.js", "destination": "/api/ip-tracker" },
+    { "source": "/(.*)", "destination": "/api/index" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,PATCH,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization" }
+      ]
+    }
   ]
 }
