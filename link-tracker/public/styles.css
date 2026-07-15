@@ -176,7 +176,7 @@ input:not(:placeholder-shown):invalid {
   background: rgba(255, 64, 64, 0.2);
   color: #ffe7e7;
 }
-.hidden a{
+#created a{
   word-break: break-all;
 }
 .activity-panel { margin: 18px 0 0; border: 1px solid rgba(0,255,120,.2); background: #020707; overflow: hidden; }
